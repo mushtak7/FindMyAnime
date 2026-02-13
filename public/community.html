@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAnime · Community</title>
+    <meta name="description"
+        content="Join the FindMyAnime community. Discuss anime, manga, and connect with fellow fans.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .community-page {
+            min-height: 100vh;
+        }
+
+        .community-hero {
+            position: relative;
+            padding: 80px 40px 60px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.15), rgba(120, 75, 160, 0.15), rgba(7, 7, 15, 0.9));
+        }
+
+        .community-hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00e676, #784ba0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 12px;
+        }
+
+        .community-hero p {
+            color: var(--muted);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Post Form */
+        .post-form-container {
+            max-width: 800px;
+            margin: 40px auto 0;
+            padding: 0 40px;
+        }
+
+        .post-form {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 28px;
+            transition: border-color 0.3s;
+        }
+
+        .post-form:focus-within {
+            border-color: var(--accent);
+        }
+
+        .post-form h3 {
+            margin: 0 0 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .post-category-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .category-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .category-btn.active {
+            background: var(--gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        .post-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        .post-textarea::placeholder {
+            color: var(--muted);
+        }
+
+        .post-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 60, 172, 0.15);
+        }
+
+        .post-form-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .post-submit {
+            padding: 10px 28px;
+            border-radius: 999px;
+            border: none;
+            background: var(--gradient);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .post-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 60, 172, 0.3);
+        }
+
+        .post-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Posts Feed */
+        .posts-container {
+            max-width: 800px;
+            margin: 30px auto 60px;
+            padding: 0 40px;
+        }
+
+        .posts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .posts-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .posts-sort {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.25s ease;
+        }
+
+        .post-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .post-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-username {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .post-timestamp {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .post-category-badge {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .post-category-badge.discussion {
+            background: rgba(33, 150, 243, 0.2);
+            color: #64b5f6;
+        }
+
+        .post-category-badge.review {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd54f;
+        }
+
+        .post-category-badge.recommendation {
+            background: rgba(0, 200, 83, 0.2);
+            color: #69f0ae;
+        }
+
+        .post-category-badge.question {
+            background: rgba(156, 39, 176, 0.2);
+            color: #ce93d8;
+        }
+
+        .post-category-badge.meme {
+            background: rgba(255, 87, 34, 0.2);
+            color: #ff8a65;
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #ddd;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .post-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .post-action-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* Loading */
+        .community-loading {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--muted);
+        }
+
+        .community-loading .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        /* Login prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .login-prompt a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-prompt a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .community-hero {
+                padding: 50px 20px 40px;
+            }
+
+            .community-hero h1 {
+                font-size: 32px;
+            }
+
+            .post-form-container,
+            .posts-container {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+
+<body class="community-page">
+
+    <header>
+        <h1 class="logo" onclick="location.href='/'">FindMyAnime</h1>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/manga.html" class="nav-link">📚 Manga</a>
+            <a href="/news.html" class="nav-link">📰 News</a>
+            <a href="/community.html" class="nav-link active">💬 Community</a>
+        </nav>
+        <div style="flex:1"></div>
+        <div id="authArea">
+            <a href="/login.html" class="auth-link">Login</a>
+            <a href="/signup.html" class="auth-link">Sign Up</a>
+        </div>
+    </header>
+
+    <section class="community-hero">
+        <h1>💬 Community</h1>
+        <p>Discuss your favorite anime and manga, share recommendations, ask questions, and connect with fellow fans.
+        </p>
+    </section>
+
+    <div class="post-form-container" id="postFormContainer">
+        <div class="post-form" id="postForm">
+            <h3>Start a Discussion</h3>
+            <div class="post-category-select">
+                <button class="category-btn active" data-cat="discussion">💬 Discussion</button>
+                <button class="category-btn" data-cat="review">⭐ Review</button>
+                <button class="category-btn" data-cat="recommendation">🎯 Recommendation</button>
+                <button class="category-btn" data-cat="question">❓ Question</button>
+                <button class="category-btn" data-cat="meme">😂 Meme/Fun</button>
+            </div>
+            <textarea class="post-textarea" id="postText"
+                placeholder="What's on your mind? Share your thoughts about anime, manga, or anything otaku..."
+                maxlength="2000"></textarea>
+            <div class="post-form-footer">
+                <span class="char-count" id="charCount">0 / 2000</span>
+                <button class="post-submit" id="submitPost">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="posts-container">
+        <div class="posts-header">
+            <h2>📢 Recent Posts</h2>
+            <select class="posts-sort" id="sortSelect">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+            </select>
+        </div>
+        <div id="postsFeed">
+            <div class="community-loading" id="postsLoading">
+                <div class="spinner"></div>
+                <p>Loading posts...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>Made with ❤️ by FindMyAnime · Powered by <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan
+                API</a></p>
+    </footer>
+
+    <script>
+        const API_BASE = "";
+        let selectedCategory = 'discussion';
+        let currentUser = null;
+
+        // Category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedCategory = btn.dataset.cat;
+            });
+        });
+
+        // Character count
+        const postText = document.getElementById('postText');
+        const charCount = document.getElementById('charCount');
+        postText.addEventListener('input', () => {
+            charCount.textContent = `${postText.value.length} / 2000`;
+        });
+
+        // Sort
+        document.getElementById('sortSelect').addEventListener('change', loadPosts);
+
+        // Submit post
+        document.getElementById('submitPost').addEventListener('click', async () => {
+            const content = postText.value.trim();
+            if (!content) return;
+
+            const btn = document.getElementById('submitPost');
+            btn.disabled = true;
+            btn.textContent = 'Posting...';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ content, category: selectedCategory })
+                });
+
+                if (res.ok) {
+                    postText.value = '';
+                    charCount.textContent = '0 / 2000';
+                    loadPosts();
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Failed to post. Please login first.');
+                }
+            } catch (e) {
+                alert('Error creating post. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Post';
+            }
+        });
+
+        async function loadPosts() {
+            const feed = document.getElementById('postsFeed');
+            const sort = document.getElementById('sortSelect').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/posts?sort=${sort}`, { credentials: "include" });
+                const posts = await res.json();
+
+                if (!posts.length) {
+                    feed.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <p>No posts yet. Be the first to start a discussion!</p>
+        </div>
+      `;
+                    return;
+                }
+
+                feed.innerHTML = posts.map(post => {
+                    const initial = (post.username || 'U')[0].toUpperCase();
+                    const timeAgo = getTimeAgo(new Date(post.created_at));
+
+                    return `
+        <div class="post-card">
+          <div class="post-card-header">
+            <div class="post-avatar">${initial}</div>
+            <div class="post-user-info">
+              <div class="post-username">${escapeHtml(post.username)}</div>
+              <div class="post-timestamp">${timeAgo}</div>
+            </div>
+            <span class="post-category-badge ${post.category || 'discussion'}">${getCategoryLabel(post.category)}</span>
+          </div>
+          <div class="post-content">${escapeHtml(post.content)}</div>
+          <div class="post-actions">
+            <button class="post-action-btn" onclick="likePost(${post.id})">👍 Like</button>
+            <button class="post-action-btn">💬 Reply</button>
+            <button class="post-action-btn">🔗 Share</button>
+          </div>
+        </div>
+      `;
+                }).join('');
+            } catch (e) {
+                feed.innerHTML = '<p style="text-align:center; color:var(--muted); padding:40px;">Unable to load posts. The community feature requires the backend server.</p>';
+            }
+        }
+
+        function getCategoryLabel(cat) {
+            const labels = {
+                discussion: '💬 Discussion',
+                review: '⭐ Review',
+                recommendation: '🎯 Recommendation',
+                question: '❓ Question',
+                meme: '😂 Meme/Fun'
+            };
+            return labels[cat] || '💬 Discussion';
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function likePost(id) {
+            // Placeholder for like functionality
+        }
+
+        // Auth check
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
+                const data = await res.json();
+                const authArea = document.getElementById('authArea');
+                if (data.user) {
+                    currentUser = data.user;
+                    authArea.innerHTML = `
+        <span class="user-name">👤 ${data.user.username || data.user}</span>
+        <button class="auth-link" onclick="logout()">Logout</button>
+      `;
+                } else {
+                    // Show login prompt instead of form
+                    document.getElementById('postFormContainer').innerHTML = `
+        <div class="login-prompt">
+          <p>💬 <a href="/login.html">Login</a> or <a href="/signup.html">Sign Up</a> to join the conversation!</p>
+        </div>
+      `;
+                }
+            } catch (e) {
+                document.getElementById('postFormContainer').innerHTML = `
+      <div class="login-prompt">
+        <p>💬 <a href="/login.html">Login</a> or <a href="/signup.html">Sign Up</a> to join the conversation!</p>
+      </div>
+    `;
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            location.reload();
+        }
+
+        // Init
+        checkAuth();
+        loadPosts();
+    </script>
+    <script src="theme-toggle.js" defer></script>
+
+</body>
+
+</html>

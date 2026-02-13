@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAnime · Manga Details</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .details-page {
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: #0b0b1a;
+            color: #fff;
+        }
+
+        .page-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+
+        .page-bg-image {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            filter: blur(60px) saturate(1.2) brightness(0.3);
+            opacity: 0.6;
+        }
+
+        .details-container {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 40px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .poster-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .poster-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            background-size: 200% 200%;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            z-index: 10;
+            animation: goldShine 3s ease infinite;
+        }
+
+        @keyframes goldShine {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .rank-badge span:first-child {
+            font-size: 9px;
+            font-weight: 800;
+            color: #5a4a1b;
+            letter-spacing: 1px;
+        }
+
+        .rank-badge span:last-child {
+            font-size: 20px;
+            font-weight: 900;
+            color: #222;
+            line-height: 1;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .info-row {
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            color: #ddd;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            min-width: 0;
+        }
+
+        .manga-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 25px;
+        }
+
+        .manga-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0 0 5px 0;
+        }
+
+        .manga-subtitle {
+            font-size: 16px;
+            color: var(--muted);
+            margin: 0 0 15px 0;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .score-badge span {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--muted);
+        }
+
+        .genre-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .genre-tag {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ccc;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .synopsis-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #ccc;
+        }
+
+        /* Characters */
+        .scroll-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .char-card {
+            flex: 0 0 110px;
+            text-align: center;
+        }
+
+        .char-img {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            transition: border-color 0.2s;
+        }
+
+        .char-card:hover .char-img {
+            border-color: var(--accent);
+        }
+
+        .char-name {
+            font-size: 12px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .char-role {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* Recommendations */
+        .rec-card {
+            flex: 0 0 160px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .rec-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .rec-img {
+            width: 160px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .rec-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* Review Section */
+        .reviews-section {
+            margin-top: 10px;
+        }
+
+        .review-form {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .review-form h3 {
+            margin: 0 0 16px;
+            font-size: 16px;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .star-rating button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            filter: grayscale(1) brightness(0.5);
+        }
+
+        .star-rating button.active {
+            filter: none;
+            transform: scale(1.15);
+        }
+
+        .star-rating button:hover {
+            transform: scale(1.2);
+        }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .review-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .review-submit {
+            margin-top: 12px;
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 12px;
+        }
+
+        .review-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .review-card-user {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .review-card-stars {
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .review-card-date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .review-card-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #ccc;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .details-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+
+            .poster-card {
+                width: 180px;
+                flex-shrink: 0;
+            }
+
+            .info-box {
+                flex: 1;
+                min-width: 250px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .poster-card {
+                width: 220px;
+            }
+
+            .info-box {
+                width: 100%;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="details-page">
+
+    <div class="page-bg">
+        <div class="page-bg-image" id="bg"></div>
+    </div>
+
+    <header
+        style="padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+        <h1 onclick="location.href='/'" style="margin:0; font-size:24px; cursor:pointer; color:white;">FindMyAnime</h1>
+        <div style="flex:1"></div>
+        <a href="/manga.html" class="btn btn-secondary" style="padding: 8px 16px; margin-right:8px;">← Manga</a>
+        <a href="/" class="btn btn-secondary" style="padding: 8px 16px;">🏠 Home</a>
+    </header>
+
+    <div class="details-container">
+
+        <aside class="sidebar">
+            <div class="poster-card">
+                <img id="poster" class="poster-image" src="">
+                <div id="rankBadge" class="rank-badge">
+                    <span>RANK</span>
+                    <span id="rankNumber">#1</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-header">Information</div>
+                <div class="info-row"><span class="info-label">Type</span><span class="info-value"
+                        id="infoType">-</span></div>
+                <div class="info-row"><span class="info-label">Chapters</span><span class="info-value"
+                        id="infoChapters">-</span></div>
+                <div class="info-row"><span class="info-label">Volumes</span><span class="info-value"
+                        id="infoVolumes">-</span></div>
+                <div class="info-row"><span class="info-label">Status</span><span class="info-value"
+                        id="infoStatus">-</span></div>
+                <div class="info-row"><span class="info-label">Published</span><span class="info-value"
+                        id="infoPublished">-</span></div>
+                <div class="info-row"><span class="info-label">Authors</span><span class="info-value"
+                        id="infoAuthors">-</span></div>
+                <div class="info-row"><span class="info-label">Serialization</span><span class="info-value"
+                        id="infoSerialization">-</span></div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+
+            <div class="manga-header">
+                <h1 class="manga-title" id="title">Loading...</h1>
+                <div class="manga-subtitle" id="subtitle"></div>
+
+                <div class="score-badge">
+                    <span id="score">N/A</span> <span>Score</span>
+                </div>
+
+                <div class="genre-list" id="genres"></div>
+
+                <div class="action-row">
+                    <a id="malLink" class="btn btn-primary" target="_blank">📖 View on MAL ↗</a>
+                    <button class="btn btn-secondary" id="addToLibraryBtn" onclick="addToLibrary()">📚 Add to
+                        Library</button>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="section-title">Synopsis</h2>
+                <p class="synopsis-text" id="synopsis"></p>
+            </div>
+
+            <div id="charSection" style="display:none">
+                <h2 class="section-title">Characters</h2>
+                <div class="scroll-container" id="charList"></div>
+            </div>
+
+            <div id="recSection" style="display:none">
+                <h2 class="section-title">Recommendations</h2>
+                <div class="scroll-container" id="recList"></div>
+            </div>
+            <div id="relationsSection" style="display:none">
+                <h2 class="section-title">📎 Related Media</h2>
+                <div id="relationsList" class="scroll-container"></div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <h2 class="section-title">📝 Reviews</h2>
+
+                <div class="review-form" id="reviewForm">
+                    <h3>Write a Review</h3>
+                    <div class="star-rating" id="starRating">
+                        <button data-rating="1">⭐</button>
+                        <button data-rating="2">⭐</button>
+                        <button data-rating="3">⭐</button>
+                        <button data-rating="4">⭐</button>
+                        <button data-rating="5">⭐</button>
+                    </div>
+                    <textarea class="review-textarea" id="reviewText"
+                        placeholder="Share your thoughts about this manga..."></textarea>
+                    <button class="btn btn-primary review-submit" id="submitReview">Submit Review</button>
+                </div>
+
+                <div id="reviewsList"></div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <footer class="site-footer" style="margin-top: 40px;">
+        <p>Made with ❤️ by FindMyAnime · Powered by <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan
+                API</a></p>
+    </footer>
+
+    <script>
+        const API_BASE = "";
+        const mangaId = new URLSearchParams(location.search).get('id');
+        let selectedRating = 0;
+
+        if (!mangaId) location.href = '/manga.html';
+
+        // Add to Library
+        async function addToLibrary() {
+            const btn = document.getElementById('addToLibraryBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Adding...';
+            try {
+                const res = await fetch('/api/manga-library/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ mangaId: Number(mangaId), status: 'plan_to_read' })
+                });
+                if (res.ok) {
+                    btn.textContent = '✅ Added!';
+                    btn.style.background = 'rgba(16,185,129,0.2)';
+                    btn.style.color = '#69f0ae';
+                    btn.style.borderColor = 'rgba(16,185,129,0.3)';
+                } else if (res.status === 401) {
+                    btn.textContent = '📚 Add to Library';
+                    btn.disabled = false;
+                    alert('Please login to add manga to your library.');
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (e) {
+                btn.textContent = '📚 Add to Library';
+                btn.disabled = false;
+                alert('Failed to add. Please try again.');
+            }
+        }
+        window.addToLibrary = addToLibrary;
+
+        // Star rating
+        document.querySelectorAll('#starRating button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedRating = parseInt(btn.dataset.rating);
+                document.querySelectorAll('#starRating button').forEach((b, i) => {
+                    b.classList.toggle('active', i < selectedRating);
+                });
+            });
+        });
+
+        // Submit review
+        document.getElementById('submitReview').addEventListener('click', async () => {
+            const text = document.getElementById('reviewText').value.trim();
+            if (!selectedRating || !text) {
+                alert('Please select a rating and write a review.');
+                return;
+            }
+            try {
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ targetId: Number(mangaId), targetType: 'manga', rating: selectedRating, comment: text })
+                });
+                if (res.ok) {
+                    document.getElementById('reviewText').value = '';
+                    selectedRating = 0;
+                    document.querySelectorAll('#starRating button').forEach(b => b.classList.remove('active'));
+                    loadReviews();
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Login required to review');
+                }
+            } catch (e) { alert('Error submitting review'); }
+        });
+
+        async function loadReviews() {
+            try {
+                const res = await fetch(`/api/reviews/${mangaId}?type=manga`);
+                const reviews = await res.json();
+                const container = document.getElementById('reviewsList');
+
+                if (!reviews.length) {
+                    container.innerHTML = '<p style="color:var(--muted); font-size:14px;">No reviews yet. Be the first to review!</p>';
+                    return;
+                }
+
+                container.innerHTML = reviews.map(r => `
+      <div class="review-card">
+        <div class="review-card-header">
+          <span class="review-card-user">👤 ${r.username}</span>
+          <span class="review-card-stars">${'⭐'.repeat(r.rating)}</span>
+          <span class="review-card-date">${new Date(r.created_at).toLocaleDateString()}</span>
+        </div>
+        <p class="review-card-text">${r.comment}</p>
+      </div>
+    `).join('');
+            } catch (e) {
+                document.getElementById('reviewsList').innerHTML = '<p style="color:var(--muted);">Reviews unavailable.</p>';
+            }
+        }
+
+        async function load() {
+            try {
+                const res = await fetch(`https://api.jikan.moe/v4/manga/${mangaId}`);
+                const { data } = await res.json();
+                render(data);
+                loadExtras();
+                loadReviews();
+            } catch (e) {
+                document.querySelector('.details-container').innerHTML = '<h2 style="text-align:center">Error loading manga.</h2>';
+            }
+        }
+
+        function render(data) {
+            document.title = `${data.title} · FindMyAnime`;
+
+            document.getElementById('bg').style.backgroundImage = `url('${data.images.jpg.large_image_url}')`;
+            document.getElementById('poster').src = data.images.jpg.large_image_url;
+            document.getElementById('title').innerText = data.title;
+            document.getElementById('subtitle').innerText = data.title_japanese || '';
+            document.getElementById('score').innerText = data.score || 'N/A';
+
+            if (data.rank) {
+                document.getElementById('rankBadge').style.display = 'flex';
+                document.getElementById('rankNumber').innerText = `#${data.rank}`;
+            }
+
+            const gDiv = document.getElementById('genres');
+            (data.genres || []).forEach(g => gDiv.innerHTML += `<span class="genre-tag">${g.name}</span>`);
+
+            document.getElementById('infoType').innerText = data.type || '-';
+            document.getElementById('infoChapters').innerText = data.chapters || '?';
+            document.getElementById('infoVolumes').innerText = data.volumes || '?';
+            document.getElementById('infoStatus').innerText = data.status || '-';
+            document.getElementById('infoPublished').innerText = data.published?.string || '-';
+            document.getElementById('infoAuthors').innerText = data.authors?.map(a => a.name).join(', ') || '-';
+            document.getElementById('infoSerialization').innerText = data.serializations?.map(s => s.name).join(', ') || '-';
+            document.getElementById('synopsis').innerText = data.synopsis || 'No synopsis available.';
+            document.getElementById('malLink').href = data.url;
+        }
+
+        async function loadExtras() {
+            try {
+                const cRes = await fetch(`https://api.jikan.moe/v4/manga/${mangaId}/characters`);
+                const cData = await cRes.json();
+                if (cData.data?.length) {
+                    document.getElementById('charSection').style.display = 'block';
+                    const list = document.getElementById('charList');
+                    cData.data.slice(0, 15).forEach(c => {
+                        list.innerHTML += `
+          <div class="char-card">
+            <img class="char-img" src="${c.character.images.jpg.image_url}">
+            <div class="char-name">${c.character.name}</div>
+            <div class="char-role">${c.role}</div>
+          </div>`;
+                    });
+                }
+            } catch (e) { }
+
+            try {
+                await new Promise(r => setTimeout(r, 400)); // Rate limit
+                const rRes = await fetch(`https://api.jikan.moe/v4/manga/${mangaId}/recommendations`);
+                const rData = await rRes.json();
+                if (rData.data?.length) {
+                    document.getElementById('recSection').style.display = 'block';
+                    const list = document.getElementById('recList');
+                    rData.data.slice(0, 10).forEach(r => {
+                        const div = document.createElement('div');
+                        div.className = 'rec-card';
+                        div.innerHTML = `<img class="rec-img" src="${r.entry.images.jpg.image_url}"><div class="rec-title">${r.entry.title}</div>`;
+                        div.onclick = () => location.href = `/manga-details.html?id=${r.entry.mal_id}`;
+                        list.appendChild(div);
+                    });
+                }
+            } catch (e) { }
+
+            // Relations (Manga <-> Anime linking)
+            try {
+                await new Promise(r => setTimeout(r, 400));
+                const relRes = await fetch(`https://api.jikan.moe/v4/manga/${mangaId}/relations`);
+                const relData = await relRes.json();
+                if (relData.data?.length) {
+                    const relList = document.getElementById('relationsList');
+                    let hasRelations = false;
+                    relData.data.forEach(rel => {
+                        rel.entry.forEach(entry => {
+                            hasRelations = true;
+                            const isAnime = entry.type === 'anime';
+                            const div = document.createElement('div');
+                            div.className = 'rec-card';
+                            div.style.cursor = 'pointer';
+                            div.innerHTML = `
+                                <div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:14px; min-width:150px; text-align:center;">
+                                    <div style="font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; font-weight:600;">${rel.relation}</div>
+                                    <div style="font-size:13px; font-weight:600; margin-bottom:4px;">${entry.name}</div>
+                                    <span style="font-size:10px; padding:2px 8px; border-radius:999px; background:${isAnime ? 'rgba(33,150,243,0.2); color:#64b5f6' : 'rgba(76,175,80,0.2); color:#81c784'};">${entry.type}</span>
+                                </div>`;
+                            div.onclick = () => {
+                                if (isAnime) location.href = `/anime.html?id=${entry.mal_id}`;
+                                else location.href = `/manga-details.html?id=${entry.mal_id}`;
+                            };
+                            relList.appendChild(div);
+                        });
+                    });
+                    if (hasRelations) document.getElementById('relationsSection').style.display = 'block';
+                }
+            } catch (e) { console.error('Relations load error:', e); }
+        }
+
+        load();
+    </script>
+    <script src="theme-toggle.js" defer></script>
+</body>
+
+</html>

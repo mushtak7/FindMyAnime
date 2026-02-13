@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAnime · My Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-page {
+            min-height: 100vh;
+        }
+
+        .profile-hero {
+            position: relative;
+            padding: 60px 40px 50px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(120, 75, 160, 0.2), rgba(255, 60, 172, 0.1), rgba(59, 130, 246, 0.1));
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(255, 60, 172, 0.1), transparent 60%);
+        }
+
+        .profile-avatar {
+            position: relative;
+            z-index: 1;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff3cac, #784ba0, #2b86c5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 800;
+            color: white;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 30px rgba(255, 60, 172, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-name {
+            position: relative;
+            z-index: 1;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0 0 4px;
+            background: linear-gradient(90deg, #fff, #ddd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-joined {
+            position: relative;
+            z-index: 1;
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 30px;
+        }
+
+        /* Stats Grid */
+        .profile-stats {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .profile-stat {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px 28px;
+            text-align: center;
+            min-width: 130px;
+            transition: all 0.3s;
+        }
+
+        .profile-stat:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .profile-stat-number {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* Content area */
+        .profile-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 40px 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .activity-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .activity-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .activity-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .activity-meta {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .badge-review {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffd54f;
+        }
+
+        .badge-post {
+            background: rgba(33, 150, 243, 0.15);
+            color: #64b5f6;
+        }
+
+        .activity-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .activity-stars {
+            color: #ffd700;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .empty-activity {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Quick links */
+        .quick-links {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-link {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        .quick-link:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-link-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .quick-link-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-hero {
+                padding: 40px 20px 30px;
+            }
+
+            .profile-content {
+                grid-template-columns: 1fr;
+                padding: 20px 16px 40px;
+            }
+
+            .profile-stat {
+                padding: 14px 20px;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body class="profile-page">
+
+    <header>
+        <h1 class="logo" onclick="location.href='/'">FindMyAnime</h1>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/manga.html" class="nav-link">📚 Manga</a>
+            <a href="/news.html" class="nav-link">📰 News</a>
+            <a href="/community.html" class="nav-link">💬 Community</a>
+        </nav>
+        <div style="flex:1"></div>
+        <div id="authArea"></div>
+    </header>
+
+    <section class="profile-hero" id="profileHero">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <h1 class="profile-name" id="profileName">Loading...</h1>
+        <p class="profile-joined" id="profileJoined">Member since...</p>
+
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-number" id="statAnime">0</div>
+                <div class="profile-stat-label">Anime</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-number" id="statManga">0</div>
+                <div class="profile-stat-label">Manga</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-number" id="statReviews">0</div>
+                <div class="profile-stat-label">Reviews</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-number" id="statPosts">0</div>
+                <div class="profile-stat-label">Posts</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="profile-content">
+        <div class="quick-links">
+            <a href="/watchlist.html" class="quick-link">
+                <div class="quick-link-icon">📚</div>
+                <div class="quick-link-label">My Library</div>
+            </a>
+            <a href="/community.html" class="quick-link">
+                <div class="quick-link-icon">💬</div>
+                <div class="quick-link-label">Community</div>
+            </a>
+            <a href="/manga.html" class="quick-link">
+                <div class="quick-link-icon">📖</div>
+                <div class="quick-link-label">Browse Manga</div>
+            </a>
+            <a href="/news.html" class="quick-link">
+                <div class="quick-link-icon">📰</div>
+                <div class="quick-link-label">Latest News</div>
+            </a>
+        </div>
+
+        <div class="activity-section" id="reviewsSection">
+            <h2>⭐ Recent Reviews</h2>
+            <div id="recentReviews">
+                <div class="empty-activity">Loading...</div>
+            </div>
+        </div>
+
+        <div class="activity-section" id="postsSection">
+            <h2>💬 Recent Posts</h2>
+            <div id="recentPosts">
+                <div class="empty-activity">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>Made with ❤️ by FindMyAnime · Powered by <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan
+                API</a></p>
+    </footer>
+
+    <script>
+        const API_BASE = "";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const authArea = document.getElementById("authArea");
+
+            try {
+                const meRes = await fetch(`${API_BASE}/api/me`, { credentials: "include" });
+                const meData = await meRes.json();
+
+                if (!meData.user) {
+                    location.href = '/login.html';
+                    return;
+                }
+
+                const username = meData.user.username || meData.user;
+                document.getElementById('profileAvatar').textContent = username[0].toUpperCase();
+                document.getElementById('profileName').textContent = username;
+                document.getElementById('profileJoined').textContent = 'Member of FindMyAnime';
+
+                authArea.innerHTML = `
+                    <a href="/watchlist.html" class="auth-link" style="color:var(--accent)">📚 Library</a>
+                    <span style="color:var(--muted)">👤 ${username}</span>
+                    <button class="auth-link" onclick="logout()">Logout</button>
+                `;
+
+                // Load stats
+                loadStats();
+                loadActivity();
+
+            } catch (e) {
+                location.href = '/login.html';
+            }
+        });
+
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_BASE}/api/user/stats`, { credentials: "include" });
+                const stats = await res.json();
+                document.getElementById('statAnime').textContent = stats.animeCount || 0;
+                document.getElementById('statManga').textContent = stats.mangaCount || 0;
+                document.getElementById('statReviews').textContent = stats.reviewCount || 0;
+                document.getElementById('statPosts').textContent = stats.postCount || 0;
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        async function loadActivity() {
+            try {
+                const res = await fetch(`${API_BASE}/api/user/activity`, { credentials: "include" });
+                const data = await res.json();
+
+                // Reviews
+                const reviewsEl = document.getElementById('recentReviews');
+                if (data.recentReviews?.length) {
+                    reviewsEl.innerHTML = data.recentReviews.map(r => `
+                        <div class="activity-item" onclick="location.href='/${r.target_type === 'manga' ? 'manga-details' : 'anime'}.html?id=${r.target_id}'">
+                            <div class="activity-meta">
+                                <span class="activity-badge badge-review">${r.target_type}</span>
+                                <span>ID: ${r.target_id}</span>
+                                <span style="margin-left:auto">${new Date(r.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="activity-stars">${'⭐'.repeat(r.rating)}</div>
+                            <div class="activity-text">${escapeHtml(r.comment)}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    reviewsEl.innerHTML = '<div class="empty-activity">No reviews yet. Start reviewing anime and manga!</div>';
+                }
+
+                // Posts
+                const postsEl = document.getElementById('recentPosts');
+                if (data.recentPosts?.length) {
+                    postsEl.innerHTML = data.recentPosts.map(p => {
+                        const catLabels = {
+                            discussion: '💬', review: '⭐', recommendation: '🎯',
+                            question: '❓', meme: '😂'
+                        };
+                        return `
+                            <div class="activity-item" onclick="location.href='/community.html'">
+                                <div class="activity-meta">
+                                    <span class="activity-badge badge-post">${catLabels[p.category] || '💬'} ${p.category}</span>
+                                    <span style="margin-left:auto">${new Date(p.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <div class="activity-text">${escapeHtml(p.content)}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    postsEl.innerHTML = '<div class="empty-activity">No posts yet. Join the community!</div>';
+                }
+            } catch (e) {
+                console.error('Activity error:', e);
+                document.getElementById('recentReviews').innerHTML = '<div class="empty-activity">Unable to load activity.</div>';
+                document.getElementById('recentPosts').innerHTML = '<div class="empty-activity">Unable to load activity.</div>';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        window.logout = () => fetch(`${API_BASE}/api/logout`, {
+            method: "POST", credentials: "include"
+        }).then(() => location.href = '/');
+    </script>
+    <script src="theme-toggle.js" defer></script>
+</body>
+
+</html>

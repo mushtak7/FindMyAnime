@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FindMyAnime – Discover Anime, Reviews & Recommendations</title>
+  <meta name="description"
+    content="FindMyAnime – Discover anime with curated recommendations, reviews, schedules, and hidden gems. Built for anime fans by anime fans.">
+
+  <meta name="theme-color" content="#141428">
+
+  <meta property="og:title" content="FindMyAnime – Discover Anime">
+  <meta property="og:description" content="Curated anime recommendations, schedules, and hidden gems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://anicrunch.vercel.app">
+
+  <link rel="preconnect" href="https://api.jikan.moe">
+  <link rel="dns-prefetch" href="https://api.jikan.moe">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Critical CSS - Loads immediately */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #07070f;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #141428, #07070f);
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+      color: #f1f1f1;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      position: relative;
+      height: 75vh;
+      min-height: 500px;
+      max-height: 700px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-slides-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+      z-index: 0;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 1;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: none !important;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right,
+          rgba(7, 7, 15, 0.85) 0%,
+          rgba(7, 7, 15, 0.55) 40%,
+          rgba(7, 7, 15, 0.25) 70%,
+          rgba(7, 7, 15, 0.15) 100%),
+        linear-gradient(to top,
+          rgba(7, 7, 15, 0.95) 0%,
+          rgba(7, 7, 15, 0.6) 35%,
+          transparent 65%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 60px 80px;
+      max-width: 650px;
+      height: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        height: auto;
+        min-height: 520px;
+        max-height: none;
+      }
+
+      .hero-content {
+        bottom: 60px;
+        padding: 20px;
+        max-width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1 class="logo" onclick="location.href='/'">FindMyAnime</h1>
+
+    <nav class="nav-links">
+      <a href="/manga.html" class="nav-link"><span>📚</span> <span>Manga</span></a>
+      <a href="/news.html" class="nav-link"><span>📰</span> <span>News</span></a>
+      <a href="/community.html" class="nav-link"><span>💬</span> <span>Community</span></a>
+      <a href="/blog/" class="nav-link"><span>📖</span> <span>Blog</span></a>
+      <a href="/schedule.html" class="nav-link"><span>📅</span> <span>Schedule</span></a>
+      <button onclick="spinWheel()" class="btn-random" aria-label="Random anime">
+        <span>🎲</span> <span>Random</span>
+      </button>
+    </nav>
+
+    <div id="authArea">
+      <a href="/login.html" class="auth-link">Login</a>
+      <a href="/signup.html" class="auth-link">Sign Up</a>
+    </div>
+
+    <div class="search-container">
+      <input id="search" placeholder="Search anime..." autocomplete="off" aria-label="Search anime" />
+      <button id="searchClear" class="search-clear" aria-label="Clear search">✕</button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="hero">
+
+    <div class="hero-slides-container" id="heroSlidesContainer">
+
+      <!-- Slide 1 -->
+      <div class="hero-slide active" data-slide="0" data-mal-id="">
+        <img class="hero-bg" src="https://cdn.myanimelist.net/images/anime/1015/138006l.jpg" srcset="
+          https://cdn.myanimelist.net/images/anime/1015/138006.jpg 600w,
+          https://cdn.myanimelist.net/images/anime/1015/138006l.jpg 1200w
+        " sizes="(max-width: 768px) 100vw, 1200px" alt="Frieren: Beyond Journey's End" width="1200" height="675"
+          fetchpriority="high" decoding="async" loading="eager" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge">🔥 Featured</span>
+          <h2 class="hero-title">Frieren: Beyond Journey's End</h2>
+          <p class="hero-meta">⭐ 9.14 • 28 eps</p>
+          <p class="hero-synopsis">During their decade-long quest to defeat the Demon King, the members of the hero's
+            party forge bonds through adventures and battles...</p>
+          <div class="hero-genres"></div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" aria-label="View Details">
+              <span class="btn-icon">▶</span> View Details
+            </button>
+            <button class="hero-btn secondary" aria-label="Add to Watchlist">
+              <span class="btn-icon">+</span> Watchlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="hero-slide" data-slide="1" data-mal-id="">
+        <img class="hero-bg" src="" alt="Featured Anime 2" width="1200" height="675" decoding="async" loading="lazy" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge">🔥 Featured</span>
+          <h2 class="hero-title">Loading...</h2>
+          <p class="hero-meta"></p>
+          <p class="hero-synopsis"></p>
+          <div class="hero-genres"></div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" aria-label="View Details">
+              <span class="btn-icon">▶</span> View Details
+            </button>
+            <button class="hero-btn secondary" aria-label="Add to Watchlist">
+              <span class="btn-icon">+</span> Watchlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="hero-slide" data-slide="2" data-mal-id="">
+        <img class="hero-bg" src="" alt="Featured Anime 3" width="1200" height="675" decoding="async" loading="lazy" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge">🔥 Featured</span>
+          <h2 class="hero-title">Loading...</h2>
+          <p class="hero-meta"></p>
+          <p class="hero-synopsis"></p>
+          <div class="hero-genres"></div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" aria-label="View Details">
+              <span class="btn-icon">▶</span> View Details
+            </button>
+            <button class="hero-btn secondary" aria-label="Add to Watchlist">
+              <span class="btn-icon">+</span> Watchlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="hero-slide" data-slide="3" data-mal-id="">
+        <img class="hero-bg" src="" alt="Featured Anime 4" width="1200" height="675" decoding="async" loading="lazy" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge">🔥 Featured</span>
+          <h2 class="hero-title">Loading...</h2>
+          <p class="hero-meta"></p>
+          <p class="hero-synopsis"></p>
+          <div class="hero-genres"></div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" aria-label="View Details">
+              <span class="btn-icon">▶</span> View Details
+            </button>
+            <button class="hero-btn secondary" aria-label="Add to Watchlist">
+              <span class="btn-icon">+</span> Watchlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5 -->
+      <div class="hero-slide" data-slide="4" data-mal-id="">
+        <img class="hero-bg" src="" alt="Featured Anime 5" width="1200" height="675" decoding="async" loading="lazy" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge">🔥 Featured</span>
+          <h2 class="hero-title">Loading...</h2>
+          <p class="hero-meta"></p>
+          <p class="hero-synopsis"></p>
+          <div class="hero-genres"></div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" aria-label="View Details">
+              <span class="btn-icon">▶</span> View Details
+            </button>
+            <button class="hero-btn secondary" aria-label="Add to Watchlist">
+              <span class="btn-icon">+</span> Watchlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="hero-nav" aria-label="Hero slide navigation">
+      <button class="hero-dot active" data-index="0" aria-label="Go to slide 1" aria-current="true"></button>
+      <button class="hero-dot" data-index="1" aria-label="Go to slide 2"></button>
+      <button class="hero-dot" data-index="2" aria-label="Go to slide 3"></button>
+      <button class="hero-dot" data-index="3" aria-label="Go to slide 4"></button>
+      <button class="hero-dot" data-index="4" aria-label="Go to slide 5"></button>
+    </nav>
+
+    <button class="hero-arrow left" id="heroPrev" aria-label="Previous slide">‹</button>
+    <button class="hero-arrow right" id="heroNext" aria-label="Next slide">›</button>
+
+  </section>
+
+  <section class="genre-filter-section" id="genreFilterSection">
+    <div class="genre-filter-content">
+      <h2>🎭 Browse by Genre</h2>
+      <div class="genre-chips" id="genreChips"></div>
+    </div>
+  </section>
+
+  <main class="layout">
+
+    <section class="left">
+
+      <div id="homeSections">
+
+        <div class="block">
+          <h2>🌸 Seasonal</h2>
+          <div class="row-wrapper">
+            <button class="nav-btn left" data-target="seasonal" aria-label="Previous">‹</button>
+            <div id="seasonal" class="row-scroll"></div>
+            <button class="nav-btn right" data-target="seasonal" aria-label="Next">›</button>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>🔥 Trending</h2>
+          <div class="row-wrapper">
+            <button class="nav-btn left" data-target="trending" aria-label="Previous">‹</button>
+            <div id="trending" class="row-scroll"></div>
+            <button class="nav-btn right" data-target="trending" aria-label="Next">›</button>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>⭐ FindMyAnime Recommends</h2>
+          <p class="editor-note">
+            Hand-picked anime we believe everyone should experience at least once.
+          </p>
+          <div id="recommendsPreview" class="row-scroll"></div>
+          <a href="/recommendations.html" class="view-all-link">
+            View all recommendations →
+          </a>
+        </div>
+
+        <!-- Community Buzz -->
+        <div class="block" id="communityBuzzBlock">
+          <h2>💬 Community Buzz</h2>
+          <p class="editor-note">What the community is saying right now</p>
+          <div id="communityBuzz" style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:16px;">
+            <div style="text-align:center; grid-column:1/-1; padding:30px; color:var(--muted); font-size:14px;">Loading
+              community feed...</div>
+          </div>
+          <a href="/community.html" class="view-all-link">
+            Join the conversation →
+          </a>
+        </div>
+
+      </div>
+
+      <div class="block" id="searchBlock" style="display:none">
+        <div id="animeContainer"></div>
+      </div>
+
+    </section>
+
+    <aside class="right">
+      <h2>🏆 Top Anime</h2>
+      <div id="topAnime" class="top-list"></div>
+    </aside>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Made with ❤️ by FindMyAnime · Powered by <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan API</a>
+    </p>
+  </footer>
+
+  <div class="spin-overlay" id="spinOverlay">
+    <div class="spinner-content">
+      <div class="big-spinner">🎲</div>
+      <p style="color: white;">Finding your next anime...</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="alert" aria-live="polite">
+    <span class="toast-icon"></span>
+    <span class="toast-message"></span>
+  </div>
+
+  <script src="script.js" defer></script>
+  <script src="theme-toggle.js" defer></script>
+
+</body>
+
+</html>
