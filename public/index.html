@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAnime – Discover Anime, Manga & More</title>
+    <meta name="description"
+        content="FindMyAnime – Discover trending anime, top-rated series, manga, and community discussions. Built for anime fans by anime fans.">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta property="og:title" content="FindMyAnime – Your Anime Universe">
+    <meta property="og:description" content="Curated anime recommendations, manga, schedules, and hidden gems.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://api.jikan.moe">
+    <link rel="dns-prefetch" href="https://api.jikan.moe">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <div class="bg-noise"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <div class="nav-logo-icon">
+                    <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="nav-logo-text">Find<span>MyAnime</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#trending" class="active">Trending</a>
+                <a href="#top-rated">Top Rated</a>
+                <a href="/manga.html">Manga</a>
+                <a href="/community.html">Community</a>
+                <a href="/schedule.html">Schedule</a>
+                <a href="/news.html">News</a>
+            </div>
+
+            <div class="nav-actions">
+                <div class="search-box">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search anime..." autocomplete="off">
+                    <div id="searchDropdown" class="search-dropdown"></div>
+                </div>
+                <div id="authArea">
+                    <a href="/login.html" class="auth-link">Login</a>
+                    <a href="/signup.html" class="auth-link">Sign Up</a>
+                </div>
+                <button
+                    style="display:none;padding:8px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--fg);cursor:pointer"
+                    id="menuBtn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:40;flex-direction:column;align-items:center;justify-content:center;gap:32px">
+        <a href="#trending" style="font-size:20px;font-weight:600;color:var(--fg);text-decoration:none">Trending</a>
+        <a href="#top-rated" style="font-size:20px;font-weight:600;color:var(--fg);text-decoration:none">Top Rated</a>
+        <a href="/manga.html" style="font-size:20px;font-weight:600;color:var(--fg);text-decoration:none">Manga</a>
+        <a href="/community.html"
+            style="font-size:20px;font-weight:600;color:var(--fg);text-decoration:none">Community</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section hero-gradient">
+        <div class="hero-inner">
+            <div class="fade-in">
+                <span class="hero-badge">🔥 Spring 2026 Season is here</span>
+                <h1 class="hero-title">Discover Your Next <span>Anime Obsession</span></h1>
+                <p class="hero-desc">Track, discover, and share your favorite anime and manga with a community of
+                    millions. Join the ultimate anime database.</p>
+                <div class="hero-btns">
+                    <button class="btn-primary"
+                        onclick="document.getElementById('trending').scrollIntoView({behavior:'smooth'})">Start
+                        Exploring</button>
+                    <button class="btn-outline" onclick="window.location.href='/community.html'">Join Community</button>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <div class="stat-val" id="animeCountStat">...</div>
+                        <div class="stat-label">Anime Titles</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div>
+                        <div class="stat-val" id="mangaCountStat">...</div>
+                        <div class="stat-label">Manga Series</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-images fade-in">
+                <div
+                    style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,51,102,0.3),rgba(0,212,255,0.3));filter:blur(80px);border-radius:50%">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Tabs -->
+    <section class="tabs-section">
+        <div class="tabs-inner">
+            <button class="tab-btn active" data-tab="all">All</button>
+            <button class="tab-btn" data-tab="trending">Trending</button>
+            <button class="tab-btn" data-tab="top">Top Rated</button>
+            <button class="tab-btn" data-tab="goat">GOAT</button>
+            <button class="tab-btn" data-tab="big3">Big 3</button>
+            <button class="tab-btn" data-tab="fanfav">Fan Favorites</button>
+            <button class="tab-btn" data-tab="manga">Manga</button>
+            <button class="tab-btn" data-tab="genres" id="toggleAnimeGenresBtn">Genres</button>
+        </div>
+    </section>
+
+    <!-- Genre Scroller -->
+    <section class="section content-section" data-section="genres" style="display:none;" id="genreContainer">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">🎭 Browse by Genre</h2>
+                    <p class="section-subtitle">Discover anime from your favorite categories</p>
+                </div>
+            </div>
+            <div class="genre-container" style="padding:0; margin-bottom: 24px;">
+                <div class="genre-scroll" id="genreScroll">
+                    <!-- Genre Chips Injected Here -->
+                </div>
+            </div>
+            <div class="anime-grid" id="genreGrid"></div>
+
+            <div class="manga-loading" id="genreLoading" style="display:none; text-align:center; padding:40px 0;">
+                <div class="spinner"
+                    style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;">
+                </div>
+                <p style="color:var(--muted)">Loading anime...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Now -->
+    <section id="trending" class="section content-section" data-section="trending">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">🔥 Trending Now</h2>
+                    <p class="section-subtitle">What everyone is watching this week</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button id="scrollLeftTrending"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="scrollRightTrending"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="h-scroll" id="trendingScroll"></div>
+        </div>
+    </section>
+
+    <!-- Big 3 -->
+    <section class="section content-section" data-section="big3"
+        style="background:linear-gradient(180deg,transparent,rgba(255,51,102,0.05),transparent)">
+        <div class="section-inner">
+            <div class="section-header fade-in"
+                style="justify-content:center;text-align:center;flex-direction:column;align-items:center">
+                <h2 class="section-title" style="margin-bottom:16px">⚔️ The Legendary Big 3</h2>
+                <p class="section-subtitle">The anime that defined a generation and shaped the industry forever</p>
+            </div>
+            <div class="big3-grid" id="big3Grid"></div>
+        </div>
+    </section>
+
+    <!-- Top Rated -->
+    <section id="top-rated" class="section content-section" data-section="top">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">🏆 Top Rated All Time</h2>
+                    <p class="section-subtitle">The highest rated anime by our community</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button id="scrollLeftTopRated"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="scrollRightTopRated"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="h-scroll" id="topRatedScroll"></div>
+        </div>
+    </section>
+
+    <!-- GOAT -->
+    <section class="section content-section" data-section="goat"
+        style="background:linear-gradient(180deg,transparent,rgba(153,51,255,0.05),transparent)">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">🐐 GOAT Candidates</h2>
+                    <p class="section-subtitle">Anime that could claim the throne</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button id="scrollLeftGoat"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="scrollRightGoat"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="h-scroll" id="goatScroll"></div>
+        </div>
+    </section>
+
+    <!-- Fan Favorites -->
+    <section class="section content-section" data-section="fanfav">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">❤️ Fan Favorites</h2>
+                    <p class="section-subtitle">Most loved by the community</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button id="scrollLeftFanFav"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="scrollRightFanFav"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="h-scroll" id="fanFavScroll"></div>
+        </div>
+    </section>
+
+    <!-- Manga -->
+    <section class="section content-section" data-section="manga"
+        style="background:linear-gradient(180deg,transparent,rgba(0,212,255,0.05),transparent)">
+        <div class="section-inner">
+            <div class="section-header fade-in">
+                <div>
+                    <h2 class="section-title">📚 Latest Manga</h2>
+                    <p class="section-subtitle">Fresh releases and ongoing series</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button id="scrollLeft"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="scrollRight"
+                        style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--fg);cursor:pointer">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="h-scroll" id="mangaScroll"></div>
+        </div>
+    </section>
+
+    <!-- Community -->
+    <section id="community" class="section content-section" data-section="community">
+        <div class="section-inner">
+            <div class="section-header fade-in"
+                style="justify-content:center;text-align:center;flex-direction:column;align-items:center">
+                <h2 class="section-title" style="margin-bottom:16px">💬 Community Hub</h2>
+                <p class="section-subtitle">Join discussions, share your thoughts, and connect with fellow otaku</p>
+            </div>
+            <div class="community-grid">
+                <div id="discussionFeed" style="display:flex;flex-direction:column;gap:16px">
+                    <div class="community-card">
+                        <p style="color:var(--muted);text-align:center;padding:20px">Loading community feed...</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="community-card sidebar-card fade-in">
+                        <h3><span class="active-dot"></span> Active Now</h3>
+                        <p style="color:var(--muted);font-size:14px">Join the conversation in our <a
+                                href="/community.html" style="color:var(--accent)">community page</a></p>
+                    </div>
+                    <div class="community-card sidebar-card fade-in">
+                        <h3>Trending Topics</h3>
+                        <a class="topic-link" href="/community.html">#JujutsuKaisenSeason3</a>
+                        <a class="topic-link" href="/community.html">#OnePieceEgghead</a>
+                        <a class="topic-link" href="/community.html">#DemonSlayerFinale</a>
+                        <a class="topic-link" href="/community.html">#ChainsawManS2</a>
+                        <a class="topic-link" href="/community.html">#SoloLevelingSeason2</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="newsletter-inner fade-in">
+            <h2>Stay Updated</h2>
+            <p>Get notified about new releases and community events</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault();alert('Thanks for subscribing!')">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit" class="btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div>
+                    <h4>Browse</h4>
+                    <ul>
+                        <li><a href="#trending">Top Anime</a></li>
+                        <li><a href="/manga.html">Top Manga</a></li>
+                        <li><a href="/schedule.html">Seasonal Anime</a></li>
+                        <li><a href="/news.html">News</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="/community.html">Forums</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/community.html">Discussions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Account</h4>
+                    <ul>
+                        <li><a href="/profile.html">Profile</a></li>
+                        <li><a href="/watchlist.html">Watchlist</a></li>
+                        <li><a href="/login.html">Login</a></li>
+                        <li><a href="/signup.html">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>About</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div class="nav-logo-icon" style="width:32px;height:32px;border-radius:8px">
+                        <svg width="16" height="16" fill="none" stroke="white" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span>FindMyAnime 2026</span>
+                </div>
+                <div style="display:flex;gap:24px">
+                    <a href="#" style="color:var(--muted);text-decoration:none">Privacy</a>
+                    <a href="#" style="color:var(--muted);text-decoration:none">Terms</a>
+                    <a href="#" style="color:var(--muted);text-decoration:none">Powered by <span
+                            style="color:var(--accent)">Jikan API</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
