@@ -77,7 +77,24 @@ async function loadTrending() {
     el.innerHTML = skeletons(8);
     try {
         const data = await jikanFetch(`${JIKAN}/top/anime?filter=airing&limit=24`);
-        el.innerHTML = data.data.slice(0, 24).map((a, i) => makeCard(a, i < 3 ? 'hot' : (i < 6 ? 'new' : ''))).join('');
+        const animeList = data.data.slice(0, 24);
+        el.innerHTML = animeList.map((a, i) => makeCard(a, i < 3 ? 'hot' : (i < 6 ? 'new' : ''))).join('');
+
+        // Update hero floating cards with top 5 trending
+        const heroCards = document.querySelectorAll('.hero-card');
+        if (heroCards.length > 0 && animeList.length >= 5) {
+            heroCards.forEach((card, i) => {
+                if (i < 5) {
+                    const imgEls = card.querySelectorAll('img');
+                    const imgEl = imgEls[imgEls.length - 1]; // Get the main image
+                    if (imgEl) {
+                        imgEl.src = animeList[i].images?.jpg?.large_image_url || animeList[i].images?.jpg?.image_url || '';
+                        imgEl.alt = animeList[i].title_english || animeList[i].title || 'Trending Anime';
+                        imgEl.onload = () => imgEl.classList.add('loaded');
+                    }
+                }
+            });
+        }
     } catch (e) { el.innerHTML = '<p style="color:var(--muted)">Could not load trending anime</p>'; }
 }
 
@@ -221,14 +238,23 @@ async function loadCommunity() {
 // Auth state
 async function checkAuth() {
     const el = document.getElementById('authArea');
+    const mobileEl = document.getElementById('mobileAuthArea');
     try {
         const res = await fetch('/api/me');
         const data = await res.json();
         if (data.user) {
-            el.innerHTML = `
+            const authLinks = `
                 <a href="/profile.html" class="auth-link">👤 ${data.user.username || data.user}</a>
                 <a href="/watchlist.html" class="auth-link">📋 Watchlist</a>
                 <button onclick="logout()" class="auth-link" style="cursor:pointer">Logout</button>`;
+            if (el) el.innerHTML = authLinks;
+
+            if (mobileEl) {
+                mobileEl.innerHTML = `
+                    <a href="/profile.html" class="auth-link" style="font-size:18px;padding:12px 32px;background:var(--card);border-radius:999px;text-decoration:none;color:var(--fg)">👤 ${data.user.username || data.user}</a>
+                    <a href="/watchlist.html" class="auth-link" style="font-size:18px;padding:12px 32px;background:var(--card);border-radius:999px;text-decoration:none;color:var(--fg)">📋 Watchlist</a>
+                    <button onclick="logout()" class="auth-link" style="font-size:18px;padding:12px 32px;background:rgba(255,51,102,0.1);color:var(--accent);border:1px solid rgba(255,51,102,0.2);border-radius:999px;cursor:pointer">Logout</button>`;
+            }
         }
     } catch (e) { }
 }
@@ -242,12 +268,18 @@ async function logout() {
 function setupSearch() {
     const input = document.getElementById('searchInput');
     const dropdown = document.getElementById('searchDropdown');
+    const mInput = document.getElementById('mobileSearchInput');
+    const mDropdown = document.getElementById('mobileSearchDropdown');
     let timeout;
+    let mTimeout;
 
     // Close dropdown on click outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.search-box')) {
             dropdown?.classList.remove('show');
+        }
+        if (!e.target.closest('.mobile-search-box')) {
+            mDropdown?.classList.remove('show');
         }
     });
 
@@ -257,43 +289,58 @@ function setupSearch() {
         }
     });
 
+    mInput?.addEventListener('focus', () => {
+        if (mInput.value.trim().length >= 2 && mDropdown.innerHTML !== '') {
+            mDropdown.classList.add('show');
+        }
+    });
+
+    const getSearchData = async (q, dd) => {
+        dd.innerHTML = '<div class="search-loading">Searching...</div>';
+        dd.classList.add('show');
+        try {
+            const data = await jikanFetch(`${JIKAN}/anime?q=${encodeURIComponent(q)}&limit=8`);
+            if (data.data.length === 0) {
+                dd.innerHTML = '<div class="search-loading">No results found</div>';
+                return;
+            }
+            dd.innerHTML = data.data.map(a => {
+                const title = a.title_english || a.title;
+                const img = a.images?.jpg?.image_url || '';
+                const eps = a.episodes ? `${a.episodes} eps` : a.status || '';
+                const score = a.score || '?';
+                return `<a href="/anime.html?id=${a.mal_id}" class="search-result-item">
+                    <img src="${img}" alt="${title}" loading="lazy">
+                    <div class="search-result-info">
+                        <h4>${title}</h4>
+                        <p>${eps}</p>
+                        <div class="rating">${starSvg} <span>${score}</span></div>
+                    </div>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            dd.innerHTML = '<div class="search-loading">Error fetching results</div>';
+        }
+    };
+
     input.addEventListener('input', () => {
         clearTimeout(timeout);
         const q = input.value.trim();
-
         if (q.length < 2) {
             dropdown.classList.remove('show');
             return;
         }
+        timeout = setTimeout(() => getSearchData(q, dropdown), 600);
+    });
 
-        dropdown.innerHTML = '<div class="search-loading">Searching...</div>';
-        dropdown.classList.add('show');
-
-        timeout = setTimeout(async () => {
-            try {
-                const data = await jikanFetch(`${JIKAN}/anime?q=${encodeURIComponent(q)}&limit=8`);
-                if (data.data.length === 0) {
-                    dropdown.innerHTML = '<div class="search-loading">No results found</div>';
-                    return;
-                }
-                dropdown.innerHTML = data.data.map(a => {
-                    const title = a.title_english || a.title;
-                    const img = a.images?.jpg?.image_url || '';
-                    const eps = a.episodes ? `${a.episodes} eps` : a.status || '';
-                    const score = a.score || '?';
-                    return `<a href="/anime.html?id=${a.mal_id}" class="search-result-item">
-                        <img src="${img}" alt="${title}" loading="lazy">
-                        <div class="search-result-info">
-                            <h4>${title}</h4>
-                            <p>${eps}</p>
-                            <div class="rating">${starSvg} <span>${score}</span></div>
-                        </div>
-                    </a>`;
-                }).join('');
-            } catch (e) {
-                dropdown.innerHTML = '<div class="search-loading">Error fetching results</div>';
-            }
-        }, 600);
+    mInput?.addEventListener('input', () => {
+        clearTimeout(mTimeout);
+        const q = mInput.value.trim();
+        if (q.length < 2) {
+            mDropdown.classList.remove('show');
+            return;
+        }
+        mTimeout = setTimeout(() => getSearchData(q, mDropdown), 600);
     });
 }
 
