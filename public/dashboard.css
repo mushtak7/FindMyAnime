@@ -3,12 +3,12 @@
 :root {
     --bg: #0a0a0f;
     --bg-secondary: #12121a;
-    --fg: #f0f0f5;
-    --muted: #6b6b80;
+    --fg: #ffffff;
+    --muted: #a3a3ba;
     --accent: #ff3366;
     --accent-secondary: #00d4ff;
     --card: #1a1a24;
-    --border: #2a2a3a;
+    --border: #38384f;
     --gradient-1: #ff3366;
     --gradient-2: #9933ff;
     --gradient-3: #00d4ff;
@@ -453,6 +453,117 @@ h6 {
 .hero-images {
     position: relative;
     display: none;
+    min-height: 450px;
+    width: 100%;
+}
+
+.hero-floating-cards {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-card {
+    position: absolute;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.hero-card:hover {
+    box-shadow: 0 0 40px rgba(255, 51, 102, 0.6), 0 0 80px rgba(0, 212, 255, 0.4);
+    border-color: rgba(255, 51, 102, 0.6);
+    animation-play-state: paused !important;
+    z-index: 10 !important;
+}
+
+.hero-card:hover img {
+    transform: scale(1.1);
+}
+
+.hero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-card img.loaded {
+    opacity: 1;
+}
+
+.hero-card-1 {
+    --rot: -6deg;
+    width: 220px;
+    height: 220px;
+    top: 20%;
+    left: 0%;
+    transform: rotate(var(--rot));
+    z-index: 2;
+    animation: floatCard 6s ease-in-out infinite;
+}
+
+.hero-card-2 {
+    --rot: 8deg;
+    width: 240px;
+    height: 320px;
+    top: 5%;
+    left: 28%;
+    transform: rotate(var(--rot));
+    z-index: 3;
+    animation: floatCard 7s ease-in-out infinite 1s;
+}
+
+.hero-card-3 {
+    --rot: -5deg;
+    width: 200px;
+    height: 200px;
+    top: 55%;
+    left: 55%;
+    transform: rotate(var(--rot));
+    z-index: 4;
+    animation: floatCard 5s ease-in-out infinite 2s;
+}
+
+.hero-card-4 {
+    --rot: 4deg;
+    width: 180px;
+    height: 160px;
+    top: 60%;
+    left: 10%;
+    transform: rotate(var(--rot));
+    z-index: 5;
+    animation: floatCard 6.5s ease-in-out infinite 0.5s;
+}
+
+.hero-card-5 {
+    --rot: 10deg;
+    width: 160px;
+    height: 160px;
+    top: 15%;
+    left: 65%;
+    transform: rotate(var(--rot));
+    z-index: 1;
+    animation: floatCard 5.5s ease-in-out infinite 1.5s;
+}
+
+@keyframes floatCard {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(var(--rot));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(var(--rot));
+    }
 }
 
 /* Buttons */
@@ -744,17 +855,17 @@ h6 {
 }
 
 .badge-hot {
-    background: linear-gradient(135deg, #ff3366, #ff6b35);
+    background: linear-gradient(135deg, #ff1a53, #e6511e);
     color: white;
 }
 
 .badge-new {
-    background: linear-gradient(135deg, #00d4ff, #00ff88);
-    color: #0a0a0f;
+    background: linear-gradient(135deg, #00b8e6, #00e67a);
+    color: #050508;
 }
 
 .badge-top {
-    background: linear-gradient(135deg, #9933ff, #ff33cc);
+    background: linear-gradient(135deg, #8a1ae6, #e61acc);
     color: white;
 }
 
@@ -1208,12 +1319,21 @@ h6 {
 }
 
 @media (max-width: 768px) {
+    #menuBtn {
+        display: block !important;
+    }
+
     .hero-inner {
         grid-template-columns: 1fr;
     }
 
     .nav-links {
         display: none;
+    }
+
+    .search-box,
+    #authArea {
+        display: none !important;
     }
 
     .hero-title {
