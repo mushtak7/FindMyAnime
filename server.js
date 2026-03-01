@@ -94,6 +94,14 @@ app.post("/api/signup", authLimiter, async (req, res) => {
     return res.status(400).json({ message: "Missing fields" });
   }
 
+  if (username.length < 3 || username.length > 50) {
+    return res.status(400).json({ message: "Username must be 3-50 characters" });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters" });
+  }
+
   try {
     const hash = await bcrypt.hash(password, 10);
 
@@ -162,9 +170,13 @@ app.get("/api/me", (req, res) => {
 ===================== */
 app.get("/api/watchlist", requireAuth, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 100));
+    const offset = (page - 1) * limit;
+
     const result = await pool.query(
-      "SELECT anime_id FROM watchlists WHERE user_id=$1",
-      [req.session.user.id]
+      "SELECT anime_id FROM watchlists WHERE user_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+      [req.session.user.id, limit, offset]
     );
 
     res.json(result.rows.map(r => r.anime_id));
@@ -175,7 +187,10 @@ app.get("/api/watchlist", requireAuth, async (req, res) => {
 });
 
 app.post("/api/watchlist/add", requireAuth, async (req, res) => {
-  const { animeId } = req.body;
+  const animeId = parseInt(req.body.animeId);
+  if (!Number.isFinite(animeId) || animeId <= 0) {
+    return res.status(400).json({ message: "Invalid anime ID" });
+  }
 
   try {
     await pool.query(
@@ -190,7 +205,10 @@ app.post("/api/watchlist/add", requireAuth, async (req, res) => {
 });
 
 app.post("/api/watchlist/remove", requireAuth, async (req, res) => {
-  const { animeId } = req.body;
+  const animeId = parseInt(req.body.animeId);
+  if (!Number.isFinite(animeId) || animeId <= 0) {
+    return res.status(400).json({ message: "Invalid anime ID" });
+  }
 
   try {
     await pool.query(
@@ -209,9 +227,13 @@ app.post("/api/watchlist/remove", requireAuth, async (req, res) => {
 ===================== */
 app.get("/api/manga-library", requireAuth, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 100));
+    const offset = (page - 1) * limit;
+
     const result = await pool.query(
-      "SELECT manga_id, status, chapters_read, volumes_read FROM manga_library WHERE user_id=$1",
-      [req.session.user.id]
+      "SELECT manga_id, status, chapters_read, volumes_read FROM manga_library WHERE user_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+      [req.session.user.id, limit, offset]
     );
     res.json(result.rows);
   } catch (err) {
@@ -221,7 +243,11 @@ app.get("/api/manga-library", requireAuth, async (req, res) => {
 });
 
 app.post("/api/manga-library/add", requireAuth, async (req, res) => {
-  const { mangaId, status } = req.body;
+  const mangaId = parseInt(req.body.mangaId);
+  if (!Number.isFinite(mangaId) || mangaId <= 0) {
+    return res.status(400).json({ message: "Invalid manga ID" });
+  }
+  const { status } = req.body;
   const validStatuses = ['reading', 'completed', 'plan_to_read', 'on_hold', 'dropped'];
   const s = validStatuses.includes(status) ? status : 'plan_to_read';
 
@@ -257,7 +283,10 @@ app.post("/api/manga-library/update", requireAuth, async (req, res) => {
 });
 
 app.post("/api/manga-library/remove", requireAuth, async (req, res) => {
-  const { mangaId } = req.body;
+  const mangaId = parseInt(req.body.mangaId);
+  if (!Number.isFinite(mangaId) || mangaId <= 0) {
+    return res.status(400).json({ message: "Invalid manga ID" });
+  }
   try {
     await pool.query(
       "DELETE FROM manga_library WHERE user_id=$1 AND manga_id=$2",
@@ -443,10 +472,14 @@ app.get("/api/posts", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT posts.id, posts.content, posts.category, posts.created_at, users.username,
-              (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) as likes_count,
-              (SELECT COUNT(*) FROM post_replies WHERE post_replies.post_id = posts.id) as replies_count,
-              EXISTS(SELECT 1 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = $1) as has_liked
-       FROM posts JOIN users ON posts.user_id = users.id
+              COALESCE(pl.likes_count, 0)::int as likes_count,
+              COALESCE(pr.replies_count, 0)::int as replies_count,
+              CASE WHEN ul.user_id IS NOT NULL THEN true ELSE false END as has_liked
+       FROM posts
+       JOIN users ON posts.user_id = users.id
+       LEFT JOIN (SELECT post_id, COUNT(*) as likes_count FROM post_likes GROUP BY post_id) pl ON pl.post_id = posts.id
+       LEFT JOIN (SELECT post_id, COUNT(*) as replies_count FROM post_replies GROUP BY post_id) pr ON pr.post_id = posts.id
+       LEFT JOIN post_likes ul ON ul.post_id = posts.id AND ul.user_id = $1
        ORDER BY posts.created_at ${sort}
        LIMIT 50`,
       [userId]
