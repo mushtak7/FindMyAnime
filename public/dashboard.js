@@ -2,16 +2,20 @@
 const JIKAN = 'https://api.jikan.moe/v4';
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
+// Rate-limit constants
+const RATE_LIMIT_MIN_INTERVAL_MS = 400;
+const RATE_LIMIT_RETRY_DELAY_MS = 1500;
+
 // Rate-limited fetch
 const queue = [];
 let lastCall = 0;
 async function jikanFetch(url) {
     const now = Date.now();
-    const wait = Math.max(0, lastCall + 400 - now);
+    const wait = Math.max(0, lastCall + RATE_LIMIT_MIN_INTERVAL_MS - now);
     lastCall = now + wait;
     await delay(wait);
     const res = await fetch(url);
-    if (res.status === 429) { await delay(1500); return jikanFetch(url); }
+    if (res.status === 429) { await delay(RATE_LIMIT_RETRY_DELAY_MS); return jikanFetch(url); }
     if (!res.ok) throw new Error(`Jikan ${res.status}`);
     return res.json();
 }
@@ -99,26 +103,13 @@ async function loadTrending() {
 }
 
 // Big 3
-function loadBig3() {
+async function loadBig3() {
     const big3Data = [
         { title: 'One Piece', id: 21, eps: '1100+', status: 'Ongoing', members: '3.2M', desc: 'The legendary pirate adventure that has captivated millions for over two decades.', color: '#ff3366' },
         { title: 'Naruto', id: 20, eps: '720', status: 'Completed', members: '2.8M', desc: 'The ninja epic that defined a generation of anime fans worldwide.', color: '#00d4ff' },
         { title: 'Bleach', id: 269, eps: '366+', status: 'Ongoing', members: '2.1M', desc: 'Soul Reaper adventures with epic battles and supernatural powers.', color: '#9933ff' },
     ];
     const el = document.getElementById('big3Grid');
-    // Load images from Jikan
-    big3Data.forEach(async (b, i) => {
-        try {
-            const data = await jikanFetch(`${JIKAN}/anime/${b.id}`);
-            const img = data.data.images?.jpg?.large_image_url || '';
-            const score = data.data.score || '?';
-            const card = el.children[i];
-            if (card) {
-                card.querySelector('img').src = img;
-                card.querySelector('.big3-score').textContent = score;
-            }
-        } catch (e) { }
-    });
     el.innerHTML = big3Data.map(b => `
         <div class="big3-card" onclick="window.location.href='/anime.html?id=${b.id}'" style="cursor:pointer">
             <div class="big3-header">
@@ -135,6 +126,18 @@ function loadBig3() {
                 <span style="font-size:13px;color:var(--muted)">${b.members} members</span>
             </div>
         </div>`).join('');
+
+    // Load images from Jikan using Promise.allSettled to handle errors gracefully
+    await Promise.allSettled(big3Data.map(async (b, i) => {
+        const data = await jikanFetch(`${JIKAN}/anime/${b.id}`);
+        const img = data.data.images?.jpg?.large_image_url || '';
+        const score = data.data.score || '?';
+        const card = el.children[i];
+        if (card) {
+            card.querySelector('img').src = img;
+            card.querySelector('.big3-score').textContent = score;
+        }
+    }));
 }
 
 // Top Rated
@@ -474,8 +477,21 @@ function setupMobileMenu() {
     const btn = document.getElementById('menuBtn');
     const menu = document.getElementById('mobileMenu');
     if (btn && menu) {
-        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
-        menu.addEventListener('click', () => menu.classList.add('hidden'));
+        btn.addEventListener('click', () => {
+            if (menu.style.display === 'none') {
+                menu.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+        menu.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' || e.target === menu) {
+                menu.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
     }
 }
 
