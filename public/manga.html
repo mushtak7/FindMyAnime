@@ -648,7 +648,7 @@
                     grid.innerHTML = '<p style="text-align:center; color:var(--error); grid-column:1/-1; padding:40px;">Failed to load manga. Please try again.</p>';
                 }
             } finally {
-                loading.style.display = 'none';
+                document.getElementById('mangaLoading').style.display = 'none';
                 mangaState.isLoading = false;
             }
         }
@@ -679,7 +679,7 @@
                 console.error('Error searching manga:', err);
                 grid.innerHTML = '<p style="text-align:center; color:var(--error); grid-column:1/-1; padding:40px;">Search failed. Please try again.</p>';
             } finally {
-                loading.style.display = 'none';
+                document.getElementById('mangaLoading').style.display = 'none';
                 mangaState.isLoading = false;
             }
         }
@@ -705,17 +705,17 @@
                 card.innerHTML = `
       ${statusLabel ? `<span class="manga-status ${statusClass}">${statusLabel}</span>` : ''}
       <div class="manga-card-img">
-          <img src="${manga.images?.jpg?.image_url || ''}" alt="${manga.title || ''}" loading="lazy">
+          <img src="${manga.images?.jpg?.image_url || ''}" alt="${escapeHtml(manga.title || '')}" loading="lazy">
           <div class="manga-card-overlay">
               <div class="manga-card-synopsis">${escapeHtml(synopsis)}</div>
               <button class="manga-read-more">Read More</button>
           </div>
       </div>
       <div class="manga-card-info">
-        <div class="manga-card-title">${manga.title || 'Unknown'}</div>
+        <div class="manga-card-title">${escapeHtml(manga.title || 'Unknown')}</div>
         <div class="manga-card-meta">
           ${manga.score ? `<span class="manga-card-score">⭐ ${manga.score}</span>` : ''}
-          <span class="manga-card-type">${manga.type || 'Manga'}</span>
+          <span class="manga-card-type">${escapeHtml(manga.type || 'Manga')}</span>
         </div>
       </div>
     `;
