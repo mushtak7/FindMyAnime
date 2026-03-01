@@ -83,7 +83,10 @@ function debounce(func, wait) {
 
 function cacheResponse(key, data, ttl = 300000) {
   if (appState.cache.size > 100) {
-    appState.cache.clear();
+    // Evict the 20 oldest entries instead of clearing the entire cache
+    const entries = [...appState.cache.entries()];
+    entries.sort((a, b) => a[1].expires - b[1].expires);
+    entries.slice(0, 20).forEach(([k]) => appState.cache.delete(k));
   }
   appState.cache.set(key, { data, expires: Date.now() + ttl });
 }
@@ -355,6 +358,10 @@ function createCard(anime, options = {}) {
 
   const imageEl = div.querySelector('img');
   if (imageEl) {
+    imageEl.onerror = () => {
+      imageEl.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 4'%3E%3Crect fill='%231a1a24' width='3' height='4'/%3E%3Ctext x='1.5' y='2.2' text-anchor='middle' fill='%23666' font-size='0.5'%3ENo Image%3C/text%3E%3C/svg%3E";
+      imageEl.classList.add('loaded');
+    };
     if (imageObserver && !options.disableLazy) {
       imageObserver.observe(imageEl);
     } else {
