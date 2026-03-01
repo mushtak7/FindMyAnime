@@ -601,6 +601,7 @@
   <script>
     const API_BASE = "";
     let currentTab = 'anime';
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =====================
     // ANIME STATE
@@ -726,6 +727,7 @@
 
         for (const id of ids) {
           await fetchAndRenderAnimeCard(id);
+          await delay(350); // Prevent Jikan API rate limit
         }
         updateAnimeStats();
         if (currentTab === 'anime') renderAnimeGrid();
@@ -818,7 +820,9 @@
 
         for (const entry of mangaLibraryData) {
           await fetchMangaDetails(entry);
+          await delay(350); // Prevent Jikan API rate limit
         }
+        updateMangaStats();
         if (currentTab === 'manga') renderMangaGrid();
       } catch (err) {
         console.error('Error loading manga library:', err);
