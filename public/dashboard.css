@@ -452,7 +452,7 @@ h6 {
 
 .hero-images {
     position: relative;
-    display: none;
+    display: block;
     min-height: 450px;
     width: 100%;
 }
@@ -1312,9 +1312,45 @@ h6 {
 }
 
 /* Responsive */
-@media (min-width: 1024px) {
+@media (max-width: 1024px) {
     .hero-images {
-        display: block;
+        min-height: 350px;
+        margin-top: 2rem;
+    }
+
+    .hero-card-1 {
+        width: 140px;
+        height: 140px;
+        top: 10%;
+        left: 0%;
+    }
+
+    .hero-card-2 {
+        width: 160px;
+        height: 220px;
+        top: -5%;
+        left: 30%;
+    }
+
+    .hero-card-3 {
+        width: 130px;
+        height: 130px;
+        top: 45%;
+        left: 60%;
+    }
+
+    .hero-card-4 {
+        width: 120px;
+        height: 100px;
+        top: 50%;
+        left: 5%;
+    }
+
+    .hero-card-5 {
+        width: 100px;
+        height: 100px;
+        top: 5%;
+        left: 70%;
     }
 }
 
