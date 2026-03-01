@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
-Sitemap: https://anicrunch.vercel.app/sitemap.xml
+Sitemap: https://www.findmyanime.tech/sitemap.xml
