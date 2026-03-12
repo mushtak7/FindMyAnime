@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About FindMyAnime — Your Anime & Manga Discovery Hub</title>
+    <meta name="description"
+        content="FindMyAnime is a community-powered anime and manga discovery platform. Learn about our mission, features, and the team behind the project.">
+    <link rel="canonical" href="https://www.findmyanime.tech/about.html">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .static-page {
+            min-height: 100vh;
+        }
+
+        .static-hero {
+            padding: 80px 40px 50px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(255, 60, 172, 0.08), rgba(7, 7, 15, 0.9));
+            border-bottom: 1px solid var(--border);
+        }
+
+        .static-hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0 0 12px;
+            background: linear-gradient(90deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .static-hero p {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 15px;
+        }
+
+        .static-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            line-height: 1.9;
+            color: #ccc;
+            font-size: 15px;
+        }
+
+        .static-content h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin: 30px 0 12px;
+        }
+
+        .static-content p {
+            margin-bottom: 16px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0 30px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .feature-item span {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .feature-item strong {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .static-hero {
+                padding: 50px 20px 30px;
+            }
+
+            .static-hero h1 {
+                font-size: 28px;
+            }
+
+            .static-content {
+                padding: 20px;
+            }
+        }
+    </style>
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FindMyAnime",
+    "url": "https://www.findmyanime.tech",
+    "description": "Community-powered anime and manga discovery platform",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.findmyanime.tech/?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+</head>
+
+<body class="static-page">
+    <header>
+        <h1 class="logo" onclick="location.href='/'">FindMyAnime</h1>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/discover.html" class="nav-link">🔍 Discover</a>
+            <a href="/community.html" class="nav-link">💬 Community</a>
+        </nav>
+        <div style="flex:1"></div>
+        <div id="authArea"></div>
+    </header>
+
+    <section class="static-hero">
+        <h1>About FindMyAnime</h1>
+        <p>Your go-to platform for discovering, tracking, and discussing anime and manga.</p>
+    </section>
+
+    <div class="static-content">
+        <h2>🎯 Our Mission</h2>
+        <p>FindMyAnime was built with one goal: to make discovering your next favorite anime or manga as easy and
+            enjoyable as possible. We combine powerful search tools, community discussions, and personalized tracking to
+            create the ultimate otaku hub.</p>
+
+        <h2>✨ Features</h2>
+        <div class="feature-grid">
+            <div class="feature-item"><span>🔍</span><strong>Smart Search & Filters</strong></div>
+            <div class="feature-item"><span>📚</span><strong>Watchlist & Library</strong></div>
+            <div class="feature-item"><span>💬</span><strong>Community Discussions</strong></div>
+            <div class="feature-item"><span>📅</span><strong>Airing Schedule</strong></div>
+            <div class="feature-item"><span>✨</span><strong>"Find Me Something" Quiz</strong></div>
+            <div class="feature-item"><span>📰</span><strong>Anime & Manga News</strong></div>
+        </div>
+
+        <h2>🛠️ Built With</h2>
+        <p>FindMyAnime is powered by <a href="https://jikan.moe" target="_blank" rel="noopener"
+                style="color:var(--accent)">Jikan API</a> (unofficial MyAnimeList API), Node.js, Express, and
+            PostgreSQL. The frontend is built with vanilla HTML, CSS, and JavaScript for maximum performance.</p>
+
+        <h2>📬 Contact</h2>
+        <p>Have feedback, a feature idea, or found a bug? Reach out through our <a href="/community.html"
+                style="color:var(--accent)">Community page</a> — we'd love to hear from you!</p>
+    </div>
+
+    <footer class="site-footer">
+        <p>Made with ❤️ by FindMyAnime · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></p>
+    </footer>
+    <script src="theme-toggle.js" defer></script>
+</body>
+
+</html>

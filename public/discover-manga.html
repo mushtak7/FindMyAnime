@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAnime · Discover Manga</title>
+    <meta name="description"
+        content="Discover new manga, manhwa, and light novels with advanced filters or take our quiz to find the perfect read.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .discover-page {
+            min-height: 100vh;
+        }
+
+        .discover-hero {
+            position: relative;
+            padding: 70px 40px 50px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.12), rgba(0, 212, 255, 0.1), rgba(120, 75, 160, 0.15));
+            border-bottom: 1px solid var(--border);
+        }
+
+        .discover-hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0 0 10px;
+            background: linear-gradient(90deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .discover-hero p {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 15px;
+        }
+
+        /* Mode switcher (Anime / Manga) */
+        .mode-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px;
+            display: inline-flex;
+        }
+
+        .mode-btn {
+            padding: 8px 20px;
+            border-radius: 9px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: transparent;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .mode-btn:hover {
+            color: white;
+        }
+
+        .mode-btn.active {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 60, 172, 0.25);
+        }
+
+        .discover-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .discover-tab {
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .discover-tab:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .discover-tab.active {
+            background: var(--gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        .content-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 40px 60px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Advanced Filters */
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #1a1a2e;
+            color: #f1f1f1;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .filter-group select option {
+            background: #1a1a2e;
+            color: #f1f1f1;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .genre-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .genre-chip {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .genre-chip:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .genre-chip.selected {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #81c784;
+        }
+
+        .search-btn {
+            padding: 12px 32px;
+            border-radius: 10px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Quiz */
+        .quiz-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .quiz-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .quiz-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .quiz-question {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .quiz-option {
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .quiz-option:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent);
+            background: rgba(255, 60, 172, 0.1);
+        }
+
+        .quiz-option-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .quiz-option-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quiz-option-desc {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .quiz-nav button {
+            padding: 10px 28px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s;
+        }
+
+        .quiz-next {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .quiz-back {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .result-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-card img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            display: block;
+        }
+
+        .result-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px 10px 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+        }
+
+        .result-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .result-card-meta {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3px;
+        }
+
+        .results-loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .discover-hero {
+                padding: 50px 20px 30px;
+            }
+
+            .discover-hero h1 {
+                font-size: 28px;
+            }
+
+            .content-section {
+                padding: 20px 16px 40px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .result-card-title {
+                font-size: 10px;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="discover-page">
+
+    <header>
+        <h1 class="logo" onclick="location.href='/'">FindMyAnime</h1>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/manga.html" class="nav-link">📚 Manga</a>
+            <a href="/news.html" class="nav-link">📰 News</a>
+            <a href="/community.html" class="nav-link">💬 Community</a>
+        </nav>
+        <div style="flex:1"></div>
+        <div id="authArea"></div>
+    </header>
+
+    <section class="discover-hero">
+        <h1>📚 Discover Manga</h1>
+        <p>Find your next favorite manga, manhwa, or light novel with powerful filters or let our quiz match you to the
+            perfect read.</p>
+
+        <!-- Mode Switcher -->
+        <div style="display:flex;justify-content:center;">
+            <div class="mode-switcher">
+                <a href="/discover.html" class="mode-btn">🎬 Anime</a>
+                <a href="/discover-manga.html" class="mode-btn active">📚 Manga</a>
+            </div>
+        </div>
+
+        <div class="discover-tabs">
+            <button class="discover-tab active" onclick="switchTab(event, 'filters')">🔎 Advanced Filters</button>
+            <button class="discover-tab" onclick="switchTab(event, 'quiz')">✨ Find Me Something</button>
+        </div>
+    </section>
+
+    <div class="content-section">
+
+        <!-- ADVANCED FILTERS TAB -->
+        <div class="tab-pane active" id="filtersPane">
+            <h3 style="font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:10px;">
+                Genres</h3>
+            <div class="genre-chips" id="genreChips"></div>
+
+            <h3
+                style="font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:10px;margin-top:16px;">
+                Tags</h3>
+            <div class="genre-chips" id="tagChips"></div>
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="filterStatus">
+                        <option value="">Any</option>
+                        <option value="RELEASING">Publishing</option>
+                        <option value="FINISHED">Finished</option>
+                        <option value="NOT_YET_RELEASED">Not Yet Released</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="HIATUS">Hiatus</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Format</label>
+                    <select id="filterFormat">
+                        <option value="">Any</option>
+                        <option value="MANGA">Manga</option>
+                        <option value="MANGA_KR">Manhwa (Korean)</option>
+                        <option value="MANGA_CN">Manhua (Chinese)</option>
+                        <option value="NOVEL">Light Novel</option>
+                        <option value="ONE_SHOT">One Shot</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Country</label>
+                    <select id="filterCountry">
+                        <option value="">Any</option>
+                        <option value="JP">🇯🇵 Japan (Manga)</option>
+                        <option value="KR">🇰🇷 South Korea (Manhwa)</option>
+                        <option value="CN">🇨🇳 China (Manhua)</option>
+                        <option value="TW">🇹🇼 Taiwan</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Score</label>
+                    <select id="filterMinScore">
+                        <option value="">Any</option>
+                        <option value="90">9+</option>
+                        <option value="80">8+</option>
+                        <option value="70">7+</option>
+                        <option value="60">6+</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="filterSort">
+                        <option value="SCORE_DESC">Score ↓</option>
+                        <option value="POPULARITY_DESC">Popularity</option>
+                        <option value="TRENDING_DESC">Trending</option>
+                        <option value="START_DATE_DESC">Newest First</option>
+                        <option value="TITLE_ROMAJI">Title A-Z</option>
+                        <option value="FAVOURITES_DESC">Most Favourited</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Start Year</label>
+                    <input type="number" id="filterYear" placeholder="e.g. 2020" min="1960" max="2026">
+                </div>
+            </div>
+
+            <div style="text-align:center;">
+                <button class="search-btn" onclick="runAdvancedSearch()">🔍 Search Manga</button>
+            </div>
+
+            <div id="filterResults"></div>
+        </div>
+
+        <!-- QUIZ TAB -->
+        <div class="tab-pane" id="quizPane">
+            <div class="quiz-container">
+
+                <!-- Step 1: Mood -->
+                <div class="quiz-step active" data-step="1">
+                    <div class="quiz-question">What kind of story are you craving?</div>
+                    <div class="quiz-options" id="moodOptions">
+                        <div class="quiz-option" data-value="action" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">⚔️</div>
+                            <div class="quiz-option-label">Action / Battle</div>
+                            <div class="quiz-option-desc">Epic fights & superpowers</div>
+                        </div>
+                        <div class="quiz-option" data-value="chill" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🌸</div>
+                            <div class="quiz-option-label">Slice of Life</div>
+                            <div class="quiz-option-desc">Calm, heartwarming stories</div>
+                        </div>
+                        <div class="quiz-option" data-value="dark" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🌑</div>
+                            <div class="quiz-option-label">Dark / Psychological</div>
+                            <div class="quiz-option-desc">Mind-bending thrillers</div>
+                        </div>
+                        <div class="quiz-option" data-value="romance" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">💕</div>
+                            <div class="quiz-option-label">Romance</div>
+                            <div class="quiz-option-desc">Love stories & drama</div>
+                        </div>
+                        <div class="quiz-option" data-value="comedy" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">😂</div>
+                            <div class="quiz-option-label">Comedy</div>
+                            <div class="quiz-option-desc">Hilarious gag manga</div>
+                        </div>
+                        <div class="quiz-option" data-value="fantasy" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🧙</div>
+                            <div class="quiz-option-label">Fantasy / Isekai</div>
+                            <div class="quiz-option-desc">Other worlds & magic</div>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="quiz-next" onclick="nextStep()">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Origin -->
+                <div class="quiz-step" data-step="2">
+                    <div class="quiz-question">What style do you prefer?</div>
+                    <div class="quiz-options" id="originOptions">
+                        <div class="quiz-option" data-value="JP" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🇯🇵</div>
+                            <div class="quiz-option-label">Japanese Manga</div>
+                            <div class="quiz-option-desc">Classic right-to-left</div>
+                        </div>
+                        <div class="quiz-option" data-value="KR" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🇰🇷</div>
+                            <div class="quiz-option-label">Korean Manhwa</div>
+                            <div class="quiz-option-desc">Full color webtoons</div>
+                        </div>
+                        <div class="quiz-option" data-value="CN" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🇨🇳</div>
+                            <div class="quiz-option-label">Chinese Manhua</div>
+                            <div class="quiz-option-desc">Cultivation & martial arts</div>
+                        </div>
+                        <div class="quiz-option" data-value="any" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🌍</div>
+                            <div class="quiz-option-label">Any Origin</div>
+                            <div class="quiz-option-desc">I'll read anything good!</div>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="quiz-back" onclick="prevStep()">← Back</button>
+                        <button class="quiz-next" onclick="nextStep()">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Length -->
+                <div class="quiz-step" data-step="3">
+                    <div class="quiz-question">How long of a read are you looking for?</div>
+                    <div class="quiz-options" id="lengthOptions">
+                        <div class="quiz-option" data-value="short" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">⚡</div>
+                            <div class="quiz-option-label">Short</div>
+                            <div class="quiz-option-desc">Under 30 chapters</div>
+                        </div>
+                        <div class="quiz-option" data-value="medium" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">📖</div>
+                            <div class="quiz-option-label">Medium</div>
+                            <div class="quiz-option-desc">30–150 chapters</div>
+                        </div>
+                        <div class="quiz-option" data-value="long" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">📚</div>
+                            <div class="quiz-option-label">Long</div>
+                            <div class="quiz-option-desc">150+ chapters</div>
+                        </div>
+                        <div class="quiz-option" data-value="any" onclick="selectQuizOption(this)">
+                            <div class="quiz-option-emoji">🎲</div>
+                            <div class="quiz-option-label">Surprise Me</div>
+                            <div class="quiz-option-desc">Any length is fine</div>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="quiz-back" onclick="prevStep()">← Back</button>
+                        <button class="quiz-next" onclick="runQuiz()">🎯 Find My Manga!</button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="quiz-step" data-step="results" id="quizResults">
+                    <div class="quiz-question">🎉 Here's what we found for you!</div>
+                    <div id="quizResultsGrid"></div>
+                    <div class="quiz-nav" style="margin-top:30px;">
+                        <button class="quiz-back" onclick="resetQuiz()">← Try Again</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Made with ❤️ by FindMyAnime · Powered by <a href="https://anilist.co" target="_blank" rel="noopener">AniList
+                API</a></p>
+    </footer>
+
+    <script>
+        const API_BASE = "";
+        const ANILIST_URL = "https://graphql.anilist.co";
+
+        // =====================
+        // ANILIST FETCH HELPER
+        // =====================
+        async function anilistFetch(query, variables, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(ANILIST_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ query, variables })
+                    });
+
+                    if (response.status === 429) {
+                        const retryAfter = response.headers.get('Retry-After') || (i + 1) * 2;
+                        console.warn(`Rate limited by AniList. Retrying after ${retryAfter} seconds... (Attempt ${i + 1}/${retries})`);
+                        await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+                        continue;
+                    }
+
+                    const data = await response.json();
+                    if (!response.ok || data.errors) throw new Error(data.errors?.[0]?.message || 'AniList API Error');
+                    return data.data;
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            }
+            throw new Error('Max retries reached for AniList API');
+        }
+
+        // =====================
+        // TAB SWITCHING
+        // =====================
+        function switchTab(evt, tab) {
+            document.querySelectorAll('.discover-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+            document.getElementById(tab === 'quiz' ? 'quizPane' : 'filtersPane').classList.add('active');
+        }
+
+        // =====================
+        // GENRE CHIPS
+        // =====================
+        const MANGA_GENRES = [
+            'Action', 'Adventure', 'Comedy', 'Drama', 'Ecchi', 'Fantasy',
+            'Horror', 'Mahou Shoujo', 'Mecha', 'Music', 'Mystery',
+            'Psychological', 'Romance', 'Sci-Fi', 'Slice of Life',
+            'Sports', 'Supernatural', 'Thriller', 'Hentai'
+        ];
+        const MANGA_TAGS = [
+            'Isekai', 'Martial Arts', 'School', 'Military', 'Historical',
+            'Demons', 'Space', 'Parody', 'Harem', 'Reverse Harem',
+            'Gender Bending', 'Vampires', 'Zombies', 'Survival',
+            'Reincarnation', 'Time Travel', 'Villainess', 'Video Games',
+            'Cooking', 'Medicine', 'Cultivation', 'Dungeon', 'Mythology',
+            'Revenge', 'Anti-Hero', 'Noir', 'Post-Apocalyptic', 'Samurai',
+            'Ninja', 'Pirates', 'Magic', 'Guns', 'Aliens', 'Robots',
+            'Coming of Age', 'Found Family', 'Amnesia', 'Tragedy',
+            'Monster Girl', 'Wuxia', 'Murim', 'Delinquents', 'Crossdressing',
+            'Ghost', 'Tokusatsu', 'Lost Civilization', 'War', 'Body Swapping',
+            'Arranged Marriage', 'Love Triangle', 'Female Protagonist', 'Male Protagonist'
+        ];
+        const selectedGenres = new Set();
+        const selectedTags = new Set();
+
+        const genreContainer = document.getElementById('genreChips');
+        MANGA_GENRES.forEach(g => {
+            const chip = document.createElement('button');
+            chip.className = 'genre-chip';
+            chip.textContent = g;
+            chip.onclick = () => {
+                if (selectedGenres.has(g)) {
+                    selectedGenres.delete(g);
+                    chip.classList.remove('selected');
+                } else {
+                    selectedGenres.add(g);
+                    chip.classList.add('selected');
+                }
+            };
+            genreContainer.appendChild(chip);
+        });
+
+        // Tag chips (different color)
+        const tagContainer = document.getElementById('tagChips');
+        MANGA_TAGS.forEach(t => {
+            const chip = document.createElement('button');
+            chip.className = 'genre-chip';
+            chip.textContent = t;
+            chip.onclick = () => {
+                if (selectedTags.has(t)) {
+                    selectedTags.delete(t);
+                    chip.classList.remove('selected');
+                    chip.style.background = '';
+                    chip.style.borderColor = '';
+                    chip.style.color = '';
+                } else {
+                    selectedTags.add(t);
+                    chip.classList.add('selected');
+                    chip.style.background = 'rgba(33, 150, 243, 0.15)';
+                    chip.style.borderColor = 'rgba(33, 150, 243, 0.4)';
+                    chip.style.color = '#64b5f6';
+                }
+            };
+            tagContainer.appendChild(chip);
+        });
+
+        // =====================
+        // ADVANCED SEARCH
+        // =====================
+        let currentPage = 1;
+        let allSearchResults = [];
+        let hasMorePages = false;
+
+        const SEARCH_QUERY = `
+        query ($page: Int, $perPage: Int, $sort: [MediaSort], $genre_in: [String], $tag_in: [String], $status: MediaStatus, $format: MediaFormat, $countryOfOrigin: CountryCode, $averageScore_greater: Int, $seasonYear: Int) {
+            Page(page: $page, perPage: $perPage) {
+                pageInfo {
+                    hasNextPage
+                    currentPage
+                }
+                media(type: MANGA, sort: $sort, genre_in: $genre_in, tag_in: $tag_in, status: $status, format: $format, countryOfOrigin: $countryOfOrigin, averageScore_greater: $averageScore_greater, seasonYear: $seasonYear) {
+                    id
+                    idMal
+                    title {
+                        romaji
+                        english
+                    }
+                    coverImage {
+                        large
+                    }
+                    averageScore
+                    chapters
+                    format
+                    status
+                    countryOfOrigin
+                }
+            }
+        }`;
+
+        async function runAdvancedSearch(loadMore = false) {
+            if (!loadMore) {
+                currentPage = 1;
+                allSearchResults = [];
+            }
+
+            const variables = {
+                page: currentPage,
+                perPage: 25,
+                sort: [document.getElementById('filterSort').value]
+            };
+
+            // Genre filter
+            if (selectedGenres.size) variables.genre_in = [...selectedGenres];
+
+            // Tag filter
+            if (selectedTags.size) variables.tag_in = [...selectedTags];
+
+            // Status filter
+            const status = document.getElementById('filterStatus').value;
+            if (status) variables.status = status;
+
+            // Format filter (handle combo values for Manhwa/Manhua)
+            const formatVal = document.getElementById('filterFormat').value;
+            if (formatVal === 'MANGA_KR') {
+                variables.format = 'MANGA';
+                if (!variables.countryOfOrigin) variables.countryOfOrigin = 'KR';
+            } else if (formatVal === 'MANGA_CN') {
+                variables.format = 'MANGA';
+                if (!variables.countryOfOrigin) variables.countryOfOrigin = 'CN';
+            } else if (formatVal) {
+                variables.format = formatVal;
+            }
+
+            // Country filter (only if not already set by format combo)
+            const country = document.getElementById('filterCountry').value;
+            if (country) variables.countryOfOrigin = country;
+
+            // Min score filter
+            const minScore = document.getElementById('filterMinScore').value;
+            if (minScore) variables.averageScore_greater = parseInt(minScore) - 1;
+
+            // Year filter
+            const year = document.getElementById('filterYear').value;
+            if (year) variables.seasonYear = parseInt(year);
+
+            const container = document.getElementById('filterResults');
+            if (!loadMore) {
+                container.innerHTML = '<div class="results-loading">🔍 Searching...</div>';
+            } else {
+                const btn = document.getElementById('loadMoreBtn');
+                if (btn) btn.textContent = '⏳ Loading...';
+            }
+
+            try {
+                // Fetch 2 pages at a time for more results
+                const pagesToFetch = loadMore ? 1 : 2;
+                for (let i = 0; i < pagesToFetch; i++) {
+                    variables.page = currentPage;
+                    const data = await anilistFetch(SEARCH_QUERY, variables);
+                    const page = data.Page;
+
+                    if (page.media?.length) {
+                        allSearchResults = allSearchResults.concat(page.media);
+                    }
+                    hasMorePages = page.pageInfo.hasNextPage;
+                    currentPage++;
+
+                    if (!hasMorePages) break;
+                }
+
+                if (!allSearchResults.length) {
+                    container.innerHTML = '<div class="results-loading">No results found. Try different filters!</div>';
+                    return;
+                }
+
+                renderResultsGrid(allSearchResults, container);
+
+                // Add Load More button
+                if (hasMorePages) {
+                    const grid = container.querySelector('.results-grid');
+                    if (grid) {
+                        const loadMoreDiv = document.createElement('div');
+                        loadMoreDiv.style.cssText = 'grid-column: 1/-1; text-align:center; padding:20px 0;';
+                        loadMoreDiv.innerHTML = '<button id="loadMoreBtn" class="search-btn" onclick="runAdvancedSearch(true)" style="font-size:14px;padding:10px 28px;">Load More ↓</button>';
+                        grid.appendChild(loadMoreDiv);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="results-loading">Error searching. Please try again.</div>';
+            }
+        }
+
+        // =====================
+        // QUIZ LOGIC
+        // =====================
+        const quizAnswers = { mood: null, origin: null, length: null };
+        let currentStep = 1;
+
+        function selectQuizOption(el) {
+            el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            const step = el.closest('.quiz-step').dataset.step;
+            if (step === '1') quizAnswers.mood = el.dataset.value;
+            if (step === '2') quizAnswers.origin = el.dataset.value;
+            if (step === '3') quizAnswers.length = el.dataset.value;
+        }
+
+        function nextStep() {
+            const steps = document.querySelectorAll('.quiz-step');
+            if (currentStep === 1 && !quizAnswers.mood) { alert('Please select a mood first!'); return; }
+            if (currentStep === 2 && !quizAnswers.origin) { alert('Please select a style!'); return; }
+            steps[currentStep - 1].classList.remove('active');
+            currentStep++;
+            steps[currentStep - 1].classList.add('active');
+        }
+
+        function prevStep() {
+            const steps = document.querySelectorAll('.quiz-step');
+            steps[currentStep - 1].classList.remove('active');
+            currentStep--;
+            steps[currentStep - 1].classList.add('active');
+        }
+
+        function resetQuiz() {
+            quizAnswers.mood = null; quizAnswers.origin = null; quizAnswers.length = null;
+            currentStep = 1;
+            document.querySelectorAll('.quiz-step').forEach((s, i) => {
+                s.classList.toggle('active', i === 0);
+            });
+            document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+        }
+
+        // Mood -> AniList genre names
+        const MOOD_GENRE_MAP = {
+            action: ['Action'],
+            chill: ['Slice of Life'],
+            dark: ['Psychological', 'Thriller'],
+            romance: ['Romance'],
+            comedy: ['Comedy'],
+            fantasy: ['Fantasy']
+        };
+
+        async function runQuiz() {
+            if (!quizAnswers.length) { alert('Please select a length!'); return; }
+
+            const steps = document.querySelectorAll('.quiz-step');
+            steps[currentStep - 1].classList.remove('active');
+            const resultsStep = document.querySelector('[data-step="results"]');
+            resultsStep.classList.add('active');
+
+            const container = document.getElementById('quizResultsGrid');
+            container.innerHTML = '<div class="results-loading">✨ Finding the perfect manga for you...</div>';
+
+            const genres = MOOD_GENRE_MAP[quizAnswers.mood] || ['Action'];
+
+            const variables = {
+                page: 1,
+                perPage: 50,
+                sort: ['SCORE_DESC'],
+                genre_in: genres,
+                averageScore_greater: 69
+            };
+
+            // Country of origin
+            if (quizAnswers.origin !== 'any') {
+                variables.countryOfOrigin = quizAnswers.origin;
+            }
+
+            try {
+                const data = await anilistFetch(SEARCH_QUERY, variables);
+                let results = data.Page.media || [];
+
+                // Apply chapter length filter locally
+                if (quizAnswers.length === 'short') {
+                    results = results.filter(m => m.chapters && m.chapters <= 30);
+                } else if (quizAnswers.length === 'medium') {
+                    results = results.filter(m => m.chapters && m.chapters >= 30 && m.chapters <= 150);
+                } else if (quizAnswers.length === 'long') {
+                    results = results.filter(m => m.chapters && m.chapters > 150 || (m.status === 'RELEASING'));
+                }
+
+                // Fallback: if length filter yields 0, show unfiltered
+                if (results.length === 0 && quizAnswers.length !== 'any') {
+                    results = data.Page.media || [];
+                }
+
+                if (!results.length) {
+                    container.innerHTML = '<div class="results-loading">No results found. Try a different combination!</div>';
+                    return;
+                }
+
+                renderResultsGrid(results.slice(0, 15), container);
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="results-loading">Error finding manga. Please try again!</div>';
+            }
+        }
+
+        // =====================
+        // SHARED: Render Results
+        // =====================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderResultsGrid(items, container) {
+            container.innerHTML = `<div class="results-grid">${items.map(m => {
+                const title = escapeHtml(m.title.english || m.title.romaji || 'Unknown');
+                const image = m.coverImage?.large || '';
+                const score = m.averageScore ? (m.averageScore / 10).toFixed(1) : 'N/A';
+                const chapters = m.chapters || '?';
+                const format = m.format ? m.format.replace('_', ' ') : '';
+                const referenceId = m.idMal || m.id;
+                const origin = m.countryOfOrigin === 'KR' ? '🇰🇷' : m.countryOfOrigin === 'CN' ? '🇨🇳' : m.countryOfOrigin === 'TW' ? '🇹🇼' : '🇯🇵';
+
+                return `
+                <div class="result-card" onclick="location.href='/manga-details.html?anilist_id=${m.id}'">
+                    <img src="${image}" alt="${title}" loading="lazy">
+                    <div class="result-card-overlay">
+                        <div class="result-card-title">${title}</div>
+                        <div class="result-card-meta">⭐ ${score} · ${chapters} ch ${origin}</div>
+                    </div>
+                </div>`;
+            }).join('')}</div>`;
+        }
+
+        // =====================
+        // AUTH CHECK
+        // =====================
+        (async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
+                const data = await res.json();
+                const authArea = document.getElementById('authArea');
+                if (data.user) {
+                    const u = data.user.username || data.user;
+                    authArea.innerHTML = `
+                    <a href="/watchlist.html" class="auth-link" style="color:var(--accent)">📚 Library</a>
+                    <a href="/profile.html" class="auth-link">👤 ${u}</a>
+                    <button class="auth-link" onclick="fetch('/api/logout',{method:'POST',credentials:'include'}).then(()=>location.reload())">Logout</button>
+                    `;
+                } else {
+                    authArea.innerHTML = `
+                    <a href="/login.html" class="auth-link">Login</a>
+                    <a href="/signup.html" class="auth-link" style="background:var(--gradient);padding:8px 16px;border-radius:8px;">Sign Up</a>
+                    `;
+                }
+            } catch (e) { }
+        })();
+    </script>
+    <script src="theme-toggle.js" defer></script>
+</body>
+
+</html>
