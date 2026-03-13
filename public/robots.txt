@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /profile.html
+Disallow: /watchlist.html
+Disallow: /login.html
+Disallow: /signup.html
 
 Sitemap: https://www.findmyanime.tech/sitemap.xml

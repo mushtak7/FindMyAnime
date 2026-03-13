@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const bcrypt = require("bcryptjs");
@@ -31,6 +32,133 @@ app.use(helmet({
    BASIC MIDDLEWARE
 ===================== */
 app.use(compression());
+
+/* =====================
+   SEO META INJECTION
+===================== */
+const SITE_URL = "https://www.findmyanime.tech";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`;
+const animeTemplate = fs.readFileSync(path.join(__dirname, "public", "anime.html"), "utf-8");
+const mangaTemplate = fs.readFileSync(path.join(__dirname, "public", "manga-details.html"), "utf-8");
+
+// Simple meta cache (max 200 entries, 1hr TTL)
+const metaCache = new Map();
+function getCachedMeta(key) {
+  const e = metaCache.get(key);
+  if (!e) return null;
+  if (Date.now() - e.ts > 3600000) { metaCache.delete(key); return null; }
+  return e.data;
+}
+function setCachedMeta(key, data) {
+  if (metaCache.size >= 200) metaCache.delete(metaCache.keys().next().value);
+  metaCache.set(key, { data, ts: Date.now() });
+}
+
+function escMeta(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function injectMeta(template, meta) {
+  const tags = `<title>${escMeta(meta.title)}</title>
+  <meta name="description" content="${escMeta(meta.description)}">
+  <meta property="og:title" content="${escMeta(meta.title)}">
+  <meta property="og:description" content="${escMeta(meta.description)}">
+  <meta property="og:image" content="${escMeta(meta.image)}">
+  <meta property="og:url" content="${escMeta(meta.url)}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escMeta(meta.title)}">
+  <meta name="twitter:description" content="${escMeta(meta.description)}">
+  <meta name="twitter:image" content="${escMeta(meta.image)}">
+  <link rel="canonical" href="${escMeta(meta.url)}">
+  ${meta.jsonLd ? `<script type="application/ld+json">${meta.jsonLd}</script>` : ""}`;
+  return template.replace(/<title>[^<]*<\/title>/, tags);
+}
+
+async function getAnimeMeta(id) {
+  const cached = getCachedMeta(`a-${id}`);
+  if (cached) return cached;
+  try {
+    const r = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { signal: AbortSignal.timeout(3000) });
+    if (!r.ok) return null;
+    const a = (await r.json()).data;
+    if (!a) return null;
+    const title = a.title_english || a.title;
+    const desc = (a.synopsis || "").replace(/\n/g, " ").substring(0, 160);
+    const img = a.images?.jpg?.large_image_url || "";
+    const meta = {
+      title: `${title} - FindMyAnime`,
+      description: desc || "Discover anime on FindMyAnime",
+      image: img || DEFAULT_OG_IMAGE,
+      url: `${SITE_URL}/anime/${id}`,
+      jsonLd: JSON.stringify({
+        "@context": "https://schema.org", "@type": "TVSeries",
+        name: title, description: desc, image: img,
+        url: `${SITE_URL}/anime/${id}`,
+        genre: (a.genres || []).map(g => g.name),
+        ...(a.score ? { aggregateRating: { "@type": "AggregateRating", ratingValue: a.score, bestRating: 10, ratingCount: a.scored_by || 0 } } : {}),
+        ...(a.episodes ? { numberOfEpisodes: a.episodes } : {})
+      })
+    };
+    setCachedMeta(`a-${id}`, meta);
+    return meta;
+  } catch { return null; }
+}
+
+async function getMangaMeta(id) {
+  const cached = getCachedMeta(`m-${id}`);
+  if (cached) return cached;
+  try {
+    const query = `query($id:Int,$idMal:Int){byId:Media(id:$id,type:MANGA){title{english romaji}description coverImage{large}chapters genres}byMal:Media(idMal:$idMal,type:MANGA){title{english romaji}description coverImage{large}chapters genres}}`;
+    const r = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables: { id: Number(id), idMal: Number(id) } }),
+      signal: AbortSignal.timeout(3000)
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    const m = d.data?.byId || d.data?.byMal;
+    if (!m) return null;
+    const title = m.title?.english || m.title?.romaji || "Manga";
+    const desc = (m.description || "").replace(/<[^>]*>/g, "").substring(0, 160);
+    const img = m.coverImage?.large || "";
+    const meta = {
+      title: `${title} - FindMyAnime`,
+      description: desc || "Read manga on FindMyAnime",
+      image: img || DEFAULT_OG_IMAGE,
+      url: `${SITE_URL}/manga/${id}`,
+      jsonLd: JSON.stringify({
+        "@context": "https://schema.org", "@type": "Book",
+        name: title, description: desc, image: img,
+        url: `${SITE_URL}/manga/${id}`,
+        genre: m.genres || []
+      })
+    };
+    setCachedMeta(`m-${id}`, meta);
+    return meta;
+  } catch { return null; }
+}
+
+// Intercept detail pages BEFORE express.static to inject meta
+app.get("/anime.html", async (req, res) => {
+  const id = parseInt(req.query.id, 10);
+  if (Number.isFinite(id)) {
+    const meta = await getAnimeMeta(id);
+    if (meta) return res.send(injectMeta(animeTemplate, meta));
+  }
+  res.sendFile(path.join(__dirname, "public", "anime.html"));
+});
+
+app.get("/manga-details.html", async (req, res) => {
+  const id = parseInt(req.query.id || req.query.anilist_id, 10);
+  if (Number.isFinite(id)) {
+    const meta = await getMangaMeta(id);
+    if (meta) return res.send(injectMeta(mangaTemplate, meta));
+  }
+  res.sendFile(path.join(__dirname, "public", "manga-details.html"));
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json()); // Fully enable JSON body parsing now that proxy is gone
 
@@ -898,20 +1026,32 @@ app.post("/api/threads/:id/comments", requireAuth, commentLimiter, async (req, r
 /* =====================
    SEO WILDCARD ROUTES
 ===================== */
-// Clean URLs: /anime/21/one-piece -> anime.html?id=21
-app.get("/anime/:id/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "anime.html"));
-});
-app.get("/anime/:id", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "anime.html"));
-});
-// /manga/2/berserk -> manga-details.html?id=2
-app.get("/manga/:id/*", (req, res) => {
-  if (/^\d+$/.test(req.params.id)) {
-    res.sendFile(path.join(__dirname, "public", "manga-details.html"));
-  } else {
-    res.sendFile(path.join(__dirname, "public", "manga.html"));
+// Clean URLs: /anime/21/one-piece -> anime.html with injected meta
+app.get("/anime/:id/*", async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isFinite(id)) {
+    const meta = await getAnimeMeta(id);
+    if (meta) return res.send(injectMeta(animeTemplate, meta));
   }
+  res.sendFile(path.join(__dirname, "public", "anime.html"));
+});
+app.get("/anime/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isFinite(id)) {
+    const meta = await getAnimeMeta(id);
+    if (meta) return res.send(injectMeta(animeTemplate, meta));
+  }
+  res.sendFile(path.join(__dirname, "public", "anime.html"));
+});
+// /manga/2/berserk -> manga-details.html with injected meta
+app.get("/manga/:id/*", async (req, res) => {
+  if (/^\d+$/.test(req.params.id)) {
+    const id = parseInt(req.params.id, 10);
+    const meta = await getMangaMeta(id);
+    if (meta) return res.send(injectMeta(mangaTemplate, meta));
+    return res.sendFile(path.join(__dirname, "public", "manga-details.html"));
+  }
+  res.sendFile(path.join(__dirname, "public", "manga.html"));
 });
 
 /* =====================

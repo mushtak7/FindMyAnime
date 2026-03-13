@@ -1,55 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Homepage -->
-  <url>
-    <loc>https://www.findmyanime.tech/</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  
-  <!-- Manga Section -->
-  <url>
-    <loc>https://www.findmyanime.tech/manga.html</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Community / Social -->
-  <url>
-    <loc>https://www.findmyanime.tech/community.html</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>always</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- News -->
-  <url>
-    <loc>https://www.findmyanime.tech/news.html</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Schedule -->
-  <url>
-    <loc>https://www.findmyanime.tech/schedule.html</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Auth and User Specific -->
-  <url>
-    <loc>https://www.findmyanime.tech/login.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.findmyanime.tech/signup.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
+  <url><loc>https://www.findmyanime.tech/</loc><lastmod>2026-03-12</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.findmyanime.tech/manga.html</loc><lastmod>2026-03-12</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.findmyanime.tech/discover.html</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.findmyanime.tech/discover-manga.html</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.findmyanime.tech/community.html</loc><lastmod>2026-03-12</lastmod><changefreq>always</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.findmyanime.tech/news.html</loc><lastmod>2026-03-12</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.findmyanime.tech/schedule.html</loc><lastmod>2026-03-12</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.findmyanime.tech/about.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/how-aot-changed-anime-forever.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/anime-better-on-rewatch.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/anime-overrated-but-still-good.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/underrated-anime-of-all-time.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.findmyanime.tech/blog/one-piece-2026.html</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>
